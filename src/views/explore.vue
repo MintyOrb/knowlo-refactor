@@ -732,16 +732,6 @@ export default {
     // init order by dropdown
     $('.orderby').dropdown()
 
-    // this is not working...
-    $('.element-item').imagesLoaded() // layout when images loaded and on progress......
-      .always((instance) => {
-        console.log('all images loaded')
-        this.$nextTick(function () {
-          window.setTimeout(() => {
-            this.layout('from images loaded, finished.')
-          }, 375)
-        })
-      })
     // workaround as long as imagesLoaded() non-functional
     setInterval(x => {
       this.layout()

@@ -65,8 +65,43 @@ import $ from 'jquery'
 import Materialize from 'materialize-css'
 import Headroom from 'headroom.js'
 import Cookies from 'js-cookie'
-import firebase from 'firebaseui'
+import firebase from 'firebase'
+import firebaseui from 'firebaseui'
 import sidemenu from '@/components/sideMenu'
+
+// init firebase app
+firebase.initializeApp({
+  apiKey: 'AIzaSyBEB96pSPjTN0F3CKaQUNoaSJiQHLc5pEM',
+  authDomain: 'knowlo-952cc.firebaseapp.com',
+  databaseURL: 'https://knowlo-952cc.firebaseio.com',
+  storageBucket: 'knowlo-952cc.appspot.com',
+  messagingSenderId: '361390483938',
+  projectId: 'knowlo-952cc'
+})
+
+var uiConfig = {
+  callbacks: {
+    signInSuccess: function (currentUser, credential, redirectUrl) {
+      // close login modal if open...
+      $('#login-modal').modal('close')
+      return true
+    }
+  },
+  signInSuccessUrl: '/#/',
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+    firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+    firebase.auth.GithubAuthProvider.PROVIDER_ID,
+    firebase.auth.EmailAuthProvider.PROVIDER_ID
+  ],
+  tosUrl: 'knowlo.io/#/legal',   // Terms of service url.
+  signInFlow: 'popup'
+}
+
+// Initialize the FirebaseUI Widget using Firebase.
+var ui = new firebaseui.auth.AuthUI(firebase.auth())
+// The start method will wait until the DOM is loaded.
+ui.start('#firebaseui-auth-container', uiConfig)
 
 export default {
   name: 'app',
@@ -152,3 +187,5 @@ export default {
   }
 }
 </script>
+<style src="materialize-css/dist/css/materialize.css"></style>
+<style>
