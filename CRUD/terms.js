@@ -179,7 +179,7 @@ function crossSection(req, res){
 * @return {Object} resource
 */
 function read(req, res){
-  // if(req.params.uid == 'undefined' && req.params.name){
+  // if(req.params.uid==='undefined' && req.params.name){
   //   var uid = req.params.name; // match term on name
   //   var cypher = "MATCH (term:term)-[r:HAS_TRANSLATION]->(translation:translation) "
   //              + "WHERE LOWER(translation.name)=LOWER({uid}) "

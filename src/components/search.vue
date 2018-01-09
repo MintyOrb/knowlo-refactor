@@ -167,7 +167,7 @@ export default {
                         success: (data) => {
                             this.suggestions = data;
                             // hide "create new" if a match is found
-                            if (Object.values(this.suggestions).findIndex(item => this.input.toLowerCase().trim() == item.translation.name.toLowerCase().trim())) {
+                            if (Object.values(this.suggestions).findIndex(item => this.input.toLowerCase().trim()===item.translation.name.toLowerCase().trim())) {
                                 this.suggestions.push({
                                     term:{},
                                     translation :{

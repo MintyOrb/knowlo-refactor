@@ -1,11 +1,11 @@
 <template>
   <div class='containerr'
   		:class="{
-  			'tokenlist list hoverable': display == 'list'
+  			'tokenlist list hoverable': display==='list'
   		}"
   	>
 
-  		<div v-if="display == 'thumb' ">
+  		<div v-if="display==='thumb' ">
   			<span @mouseleave="leave()">
   				<div class="termWidth">
   					<div class="menu" @mouseenter="delayHover()"  v-bind:class="{'active': hovering}">
@@ -87,7 +87,7 @@
   			</span>
   		</div>
 
-  		<div @click="main" v-if="display == 'list' || display == 'card'" class='cont'>
+  		<div @click="main" v-if="display==='list' || display==='card'" class='cont'>
   				<span class='tokenlist-title'>
   					<span class='tokenlist-title-left'>
   						<!-- <span class='score'>8</span>
@@ -124,7 +124,7 @@
 
   		</div>
 
-  		<div class='hoverable' v-if="display == 'godMode'">
+  		<div class='hoverable' v-if="display==='godMode'">
   			<span>{{term.term.uid}}</span>
   			<!-- <span>{{term.setID}}</span> -->
   			<input type="text" v-model='term.translation.name' v-on:blur="name(term.translation.uid,term.translation.name)" />
@@ -262,7 +262,7 @@ export default {
       if(this.term.status){
         this.status=this.term.status;
       }
-      if(this.$parent.$el && this.$parent.$el._prevClass == 'termQuery'){ // stupid way to change css. cake component param/option instead
+      if(this.$parent.$el && this.$parent.$el._prevClass==='termQuery'){ // stupid way to change css. cake component param/option instead
         this.inSidebar = true; // defaults to false
       }
 

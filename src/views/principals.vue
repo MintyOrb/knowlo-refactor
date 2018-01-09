@@ -53,9 +53,11 @@
 	</div>
 </template>
 <script>
+import $ from 'jquery'
 export default {
-  name: "principals",
-  mounted: function(){
-   $('.scrollspy').scrollSpy();  }
+  name: 'principals',
+  mounted () {
+    $('.scrollspy').scrollSpy()
+  }
 }
 </script>

@@ -17,10 +17,10 @@
 		</ul> -->
 		<div v-if="re.resource.mThumb"
 			:class="{
-      'thumb waves-effect waves-block waves-light z-depth-1 hoverable': display == 'thumb' || display =='list' || display=='godMode',
-      'card-image': display == 'card',
-      'margin20': display == 'thumb' || display == 'list' ,
-      'inline mb': display == 'list'}"
+      'thumb waves-effect waves-block waves-light z-depth-1 hoverable': display==='thumb' || display =='list' || display=='godMode',
+      'card-image': display==='card',
+      'margin20': display==='thumb' || display==='list' ,
+      'inline mb': display==='list'}"
 			>
 			<router-link :to="{ name: 'resourceSub', params: { uid: re.resource.uid }}">
 				<img :src="re.resource.mThumb" />
@@ -53,8 +53,8 @@
 
 		<div v-if="voting & display !='thumb'" class="margin20" >
 			<div class="">
-				<i  @click="ratingDisplay='global'" @mouseenter="ratingDisplay='global'" class="fa fa-lg fa-globe rating" :class="{'selected': ratingDisplay == 'global'}"></i>
-				<i  @click="ratingDisplay='member'" @mouseenter="ratingDisplay='member'" class="fa fa-lg fa-user rating" :class="{'selected': ratingDisplay == 'member'}"></i>
+				<i  @click="ratingDisplay='global'" @mouseenter="ratingDisplay='global'" class="fa fa-lg fa-globe rating" :class="{'selected': ratingDisplay==='global'}"></i>
+				<i  @click="ratingDisplay='member'" @mouseenter="ratingDisplay='member'" class="fa fa-lg fa-user rating" :class="{'selected': ratingDisplay==='member'}"></i>
 			</div>
 			<span>
 				<span style="font-weight:300" >Quality</span><span v-if="displayQuality" style="font-weight:300" class='right'>{{displayQuality.toFixed(2).replace(/^0+/, '')}}</span>
@@ -118,7 +118,7 @@
           Materialize.toast('Something went wrong...', 4000)
         }
       }, response => {
-        if(response.status == 401){
+        if(response.status===401){
           Materialize.toast('You must be logged in to vote!', 4000)
           $('#login-modal').modal('open')
           this.setRatingSliders('global');
@@ -168,7 +168,7 @@
          });
         quality.noUiSlider.on('change', (a,b,value) => { //listen for vote
 
-          if(this.re.memberVote && this.re.memberVote.quality != value[0]){
+          if(this.re.memberVote && this.re.memberVote.quality !==value[0]){
             this.re.memberVote.quality = value[0];
             this.vote();
           } else if(!this.re.memberVote){ // prevents vote trigger on resource init
@@ -188,7 +188,7 @@
          }
         });
        complexity.noUiSlider.on('change', (a,b,value) => {
-         if(this.re.memberVote && this.re.memberVote.complexity != value[0]){
+         if(this.re.memberVote && this.re.memberVote.complexity !==value[0]){
            this.re.memberVote.complexity = value[0];
            this.vote();
          } else if(!this.re.memberVote){
