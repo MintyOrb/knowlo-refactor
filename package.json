@@ -29,6 +29,7 @@
     "leaflet": "^1.0.3",
     "lodash": "^4.17.4",
     "materialize-css": "^0.100.2",
+    "nouislider": "^10.1.0",
     "seraph": "^0.15.2",
     "seraph-model": "^0.10.1",
     "shortid": "^2.2.8",

@@ -1,12 +1,12 @@
-<template>
+y === '<template>
   <div class='resource'
 
 		:class="{
-    'list z-depth-1 hoverable': display=='list',
-    'card z-depth-1 hoverable': display=='card'}"
+    'list z-depth-1 hoverable': display === 'list',
+    'card z-depth-1 hoverable': display === 'card'}"
 		>
-		<!-- <div style="height:20px;"@click.stop.prevent="" class="right boo" data-activates='reOptions' data-hover="true" data-alignment='right'><i class='material-icons'>more_horiz</i></div>
-		<ul id="reOptions" class="dropdown-content">
+		<!-- <div style='height:20px;'@click.stop.prevent='' class='right boo' data-activates='reOptions' data-hover='true' data-alignment='right'><i class='material-icons'>more_horiz</i></div>
+		<ul id='reOptions' class='dropdown-content'>
 			<li>add token</li>
 			<li>expand</li>
 			<li>shrink</li>
@@ -17,7 +17,7 @@
 		</ul> -->
 		<div v-if="re.resource.mThumb"
 			:class="{
-      'thumb waves-effect waves-block waves-light z-depth-1 hoverable': display==='thumb' || display =='list' || display=='godMode',
+      'thumb waves-effect waves-block waves-light z-depth-1 hoverable': display==='thumb' || display =='list' || display === 'godMode',
       'card-image': display==='card',
       'margin20': display==='thumb' || display==='list' ,
       'inline mb': display==='list'}"
@@ -34,11 +34,11 @@
 
 		<div v-if="re.resource.title && display =='card' || display =='list'"
 			:class="{
-      'truncate inline tmargin': display=='list',
-      'card-content': display=='card'}"
+      'truncate inline tmargin': display === 'list',
+      'card-content': display === 'card'}"
 			>
 			<router-link :to="{ name: 'resourceSub', params: { uid: re.resource.uid }}">
-				<span :class="{'title': display=='card'}">{{re.resource.title}}</span>
+				<span :class="{'title': display === 'card'}">{{re.resource.title}}</span>
 			</router-link>
 
 			<div class='subtitle' v-if="re.resource.subtitle">
@@ -58,16 +58,16 @@
 			</div>
 			<span>
 				<span style="font-weight:300" >Quality</span><span v-if="displayQuality" style="font-weight:300" class='right'>{{displayQuality.toFixed(2).replace(/^0+/, '')}}</span>
-				<div  style="margin-top:5px;margin-bottom:5px" :id="'quality-slider-'+_uid"></div>
+				<div style="margin-top:5px;margin-bottom:5px" :id="'quality-slider-'+_uid"></div>
 				<!-- <span style="font-weight:300" >4.1</span> -->
 			</span>
 			<span>
 				<span style="font-weight:300" >Complexity</span><span v-if="displayComplexity" style="font-weight:300" class='right'>{{displayComplexity.toFixed(2).replace(/^0+/, '')}}</span>
-				<div  style="margin-top:5px;margin-bottom:5px" :id="'complexity-slider-'+_uid"></div>
+				<div style="margin-top:5px;margin-bottom:5px" :id="'complexity-slider-'+_uid"></div>
 			</span>
 		</div>
 
-		<div v-if="display =='card' " class='card-action'>
+		<div v-if="display === 'card' " class='card-action'>
  			<span class='left card-bottom'><i class="tiny material-icons">visibility</i>{{trimNumber(re.resource.viewCount,1) || 0}}</span>
 
  			<span class='right card-bottom'>{{re.votes}}
@@ -75,7 +75,7 @@
 			</span>
  		</div>
 
-		<div class='' v-if='display=="godMode"'>
+		<div class='' v-if='display === "godMode"'>
 			<input v-model='re.resource.uid'></input>
 
 			<input type="text" v-if='re.resource.title' v-model='re.resource.title' v-on:blur="" />
@@ -87,8 +87,12 @@
 </template>
 
 <script>
-{
-  name: "resource",
+import noUiSlider from 'nouislider'
+import Materialize from 'materialize-css'
+import $ from 'jquery'
+
+export default {
+  name: 'resource',
   props: {
     re: Object,
     voting: {
@@ -97,147 +101,146 @@
     },
     display: String
   },
-  data: () =>  {
+  data: () => {
     return {
       displayQuality: null,
       displayComplexity: null,
-      ratingDisplay: 'global',
+      ratingDisplay: 'global'
     }
   },
-  methods:{
-    vote: function(){
-      this.$http.put('/api/resource/'+this.re.resource.uid+'/vote',{vote:this.re.memberVote}).then(response => {
-        if(response.body){
-          Materialize.toast('voted!', 2000);
-          this.re.globalVote=response.body.globalVote;
-          this.re.votes = response.body.votes;
-          this.$emit('vote-cast');
-          this.setRatingSliders('member');
-          this.ratingDisplay='member';
+  methods: {
+    vote () {
+      this.$http.put('/api/resource/' + this.re.resource.uid + '/vote', {vote: this.re.memberVote}).then(response => {
+        if (response.body) {
+          Materialize.toast('voted!', 2000)
+          this.re.globalVote = response.body.globalVote
+          this.re.votes = response.body.votes
+          this.$emit('vote-cast')
+          this.setRatingSliders('member')
+          this.ratingDisplay = 'member'
         } else {
           Materialize.toast('Something went wrong...', 4000)
         }
       }, response => {
-        if(response.status===401){
+        if (response.status === 401) {
           Materialize.toast('You must be logged in to vote!', 4000)
           $('#login-modal').modal('open')
-          this.setRatingSliders('global');
+          this.setRatingSliders('global')
         } else {
           Materialize.toast('Something went wrong...are you online?', 4000)
         }
-      });
+      })
     },
-    deleteResource: function(uid){
-      this.$http.delete('/api/resource/'+uid+'/full').then(response => {
-        if(response.body){
+    deleteResource (uid) {
+      this.$http.delete('/api/resource/' + uid + '/full').then(response => {
+        if (response.body) {
           Materialize.toast('deleted resource', 4000)
         } else {
           Materialize.toast('Something went wrong...', 4000)
         }
       }, response => {
-         Materialize.toast('Something went wrong...are you online?', 4000)
-      });
+        Materialize.toast('Something went wrong...are you online?', 4000)
+      })
     },
-    trimNumber: function(num, digits) { // from http://stackoverflow.com/a/9462382/2061741 - displays number of views
-      if(num && digits && typeof(num)==='number'){
-        var si = [ { value: 1E18, symbol: "E" }, { value: 1E15, symbol: "P" }, { value: 1E12, symbol: "T" }, { value: 1E9,  symbol: "G" }, { value: 1E6,  symbol: "M" }, { value: 1E3,  symbol: "k" }], rx = /\.0+$|(\.[0-9]*[1-9])0+$/, i;
+    trimNumber (num, digits) { // from http://stackoverflow.com/a/9462382/2061741 - displays number of views
+      if (num && digits && typeof (num) === 'number') {
+        var si = [{ value: 1E18, symbol: 'E' }, { value: 1E15, symbol: 'P' }, { value: 1E12, symbol: 'T' }, { value: 1E9, symbol: 'G' }, { value: 1E6, symbol: 'M' }, { value: 1E3, symbol: 'k' }]
+        var rx = /\.0+$|(\.[0-9]*[1-9])0+$/
+        var i
         for (i = 0; i < si.length; i++) {
           if (num >= si[i].value) {
-            return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
+            return (num / si[i].value).toFixed(digits).replace(rx, '$1') + si[i].symbol
           }
         }
-        return num.toFixed(digits).replace(rx, "$1");
-      } else if (this.voting && typeof(num)!='number'){
-        console.log('not number... ',typeof(num))
+        return num.toFixed(digits).replace(rx, '$1')
+      } else if (this.voting && typeof (num) !== 'number') {
+        console.log('not number... ', typeof (num))
         console.log(num)
       }
     },
-    initSlider: function(){
-
-      if(this.voting){
+    initSlider () {
+      if (this.voting) {
         console.log('voting is true')
-         var quality = document.getElementById('quality-slider-' + this._uid);
-         noUiSlider.create(quality, {
-          start: .5,
-          connect: [true,false],
-          behavior: "tap-drag-hover",
+        var quality = document.getElementById('quality-slider-' + this._uid)
+        noUiSlider.create(quality, {
+          start: 0.5,
+          connect: [true, false],
+          behavior: 'tap-drag-hover',
           range: {
             'min': 0,
             'max': 1
           }
-         });
-        quality.noUiSlider.on('change', (a,b,value) => { //listen for vote
-
-          if(this.re.memberVote && this.re.memberVote.quality !==value[0]){
-            this.re.memberVote.quality = value[0];
-            this.vote();
-          } else if(!this.re.memberVote){ // prevents vote trigger on resource init
-            this.re.memberVote = {};
-            this.vote();
+        })
+        quality.noUiSlider.on('change', (a, b, value) => { // listen for vote
+          if (this.re.memberVote && this.re.memberVote.quality !== value[0]) {
+            this.re.memberVote.quality = value[0]
+            this.vote()
+          } else if (!this.re.memberVote) { // prevents vote trigger on resource init
+            this.re.memberVote = {}
+            this.vote()
           }
-        });
+        })
 
-        var complexity = document.getElementById('complexity-slider-' + this._uid);
+        var complexity = document.getElementById('complexity-slider-' + this._uid)
         noUiSlider.create(complexity, {
-         start: .5,
-         connect: [true,false],
-         behavior: "tap-drag-hover",
-         range: {
-           'min': 0,
-           'max': 1
-         }
-        });
-       complexity.noUiSlider.on('change', (a,b,value) => {
-         if(this.re.memberVote && this.re.memberVote.complexity !==value[0]){
-           this.re.memberVote.complexity = value[0];
-           this.vote();
-         } else if(!this.re.memberVote){
-           this.re.memberVote = {};
-           this.vote();
-         }
-
-       });
+          start: 0.5,
+          connect: [true, false],
+          behavior: 'tap-drag-hover',
+          range: {
+            'min': 0,
+            'max': 1
+          }
+        })
+        complexity.noUiSlider.on('change', (a, b, value) => {
+          if (this.re.memberVote && this.re.memberVote.complexity !== value[0]) {
+            this.re.memberVote.complexity = value[0]
+            this.vote()
+          } else if (!this.re.memberVote) {
+            this.re.memberVote = {}
+            this.vote()
+          }
+        })
       }
     },
-    setRatingSliders: function(disp){
-      if(disp=='global' && this.re.globalVote && this.voting && this.re.globalVote.quality){
-        this.$nextTick( x=> {
-          var quality = document.getElementById('quality-slider-' + this._uid);
+    setRatingSliders (disp) {
+      if (disp === 'global' && this.re.globalVote && this.voting && this.re.globalVote.quality) {
+        this.$nextTick(x => {
+          var quality = document.getElementById('quality-slider-' + this._uid)
           quality.noUiSlider.set(this.re.globalVote.quality)
-          var complexity = document.getElementById('complexity-slider-' + this._uid);
+          var complexity = document.getElementById('complexity-slider-' + this._uid)
           complexity.noUiSlider.set(this.re.globalVote.complexity)
         })
-        this.displayQuality = this.re.globalVote.quality;
-        this.displayComplexity = this.re.globalVote.complexity;
-      } else if(this.re.memberVote){
-        this.$nextTick( x=> {
-          if(document.getElementById('quality-slider-' + this._uid)){ //TODO: figure out why element is sometimes not found when switching display types? Race condition?
-            var quality = document.getElementById('quality-slider-' + this._uid);
+        this.displayQuality = this.re.globalVote.quality
+        this.displayComplexity = this.re.globalVote.complexity
+      } else if (this.re.memberVote) {
+        this.$nextTick(x => {
+          if (document.getElementById('quality-slider-' + this._uid)) { // TODO: figure out why element is sometimes not found when switching display types? Race condition?
+            var quality = document.getElementById('quality-slider-' + this._uid)
             quality.noUiSlider.set(this.re.memberVote.quality)
-            var complexity = document.getElementById('complexity-slider-' + this._uid);
+            var complexity = document.getElementById('complexity-slider-' + this._uid)
             complexity.noUiSlider.set(this.re.memberVote.complexity)
           }
         })
-        this.displayQuality = this.re.memberVote.quality;
-        this.displayComplexity = this.re.memberVote.complexity;
+        this.displayQuality = this.re.memberVote.quality
+        this.displayComplexity = this.re.memberVote.complexity
       } else {
         this.ratingDisplay = 'global'
       }
     }
   },
-  mounted: function(){
-    this.initSlider();
-    this.$on('dataupdated',x=>{
-     this.setRatingSliders('member');
+  mounted () {
+    this.initSlider()
+    this.$on('dataupdated', x => {
+      this.setRatingSliders('member')
     })
-    this.setRatingSliders('global');
+    this.setRatingSliders('global')
   },
   watch: {
-    re: function(x,b) {
+    re (x, b) {
       console.log('data updated')
       this.$emit('dataupdated')
     },
-    ratingDisplay: function(val){
+    ratingDisplay (val) {
       this.setRatingSliders(val)
     }
   }

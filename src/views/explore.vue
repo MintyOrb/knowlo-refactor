@@ -228,8 +228,11 @@ import $ from 'jquery'
 import Cookies from 'js-cookie'
 import Materialize from 'materialize-css'
 import Router from 'vue-router'
+import token from '@/components/token'
+import resource from '@/components/resource'
 export default {
   name: 'exploreComp',
+  components: [token, resource],
   props: ['termQuery', 'member'],
   data () {
     return {

@@ -66,9 +66,12 @@ import $ from 'jquery'
 import Headroom from 'headroom.js'
 import Cookies from 'js-cookie'
 import firebase from 'firebaseui'
+import token from '@/components/token'
+import resource from '@/components/resource'
 
 export default {
   name: 'app',
+  components: [token, resource],
   data () {
     return {
       member: {

@@ -137,143 +137,143 @@
   	</div>
 </template>
 <script>
+import Materialize from 'materialize-css'
+import $ from 'jquery'
+
 export default {
-    name: "term",
-    props:{
-      term: Object,
-      display: String,
-      hide: {
-        type: String,
-        default: ''
-      },
-      persistAction: {
-        type:Boolean,
-        default: true
-      }
+  name: 'token',
+  props: {
+    term: Object,
+    display: String,
+    hide: {
+      type: String,
+      default: ''
     },
-    data: () =>  {
-      return {
-        inSidebar: false,
-        hovering: false,
-        status: {
-          pinnedIcon: false,
-          includeIcon: false,
-          excludeIcon: false,
-          removeIcon: false,
-          focusIcon: false,
-          infoIcon: false,
-          lensIcon: false,
-        }
-      }
-    },
-    methods: {
-      name:function(uid,val){
-        this.$http.put('/god/name/'+uid+'/'+ val).then(response => {
-          if(response.body){
-            Materialize.toast('changed name', 4000)
-          } else {
-            Materialize.toast('Something went wrong...', 4000)
-          }
-        }, response => {
-           Materialize.toast('Something went wrong...are you online?', 4000)
-        });
-      },
-      order:function(termID,order){
-        console.log(termID, order)
-        this.$http.put('/god/order/'+termID+'/'+ order +'/'+ this.$route.params.uid).then(response => {
-          if(response.body){
-            Materialize.toast('changed order', 4000)
-          } else {
-            Materialize.toast('Something went wrong...', 4000)
-          }
-        }, response => {
-           Materialize.toast('Something went wrong...are you online?', 4000)
-        });
-      },
-      termAction: function(action){
-
-      },
-      main: function(){
-        if(this.persistAction){
-          this.status.includeIcon = !this.status.includeIcon;
-        }
-        this.term.status = this.status;
-        this.$emit('main', this.term)
-      },
-      remove: function(){
-        if(this.persistAction){
-          this.status.removeIcon = !this.status.removeIcon;
-        }
-        this.term.status = this.status;
-        this.$emit('remove', this.term)
-      },
-      include: function(){
-        // if(this.persistAction){
-          this.status.includeIcon = !this.status.includeIcon;
-        // }
-        this.term.status = this.status;
-        this.$emit('include', this.term)
-      },
-      exclude: function(){
-        if(this.persistAction){
-          this.status.excludeIcon = !this.status.excludeIcon;
-        }
-        this.term.status = this.status;
-        this.$emit('exclude', this.term)
-      },
-      focus: function(){
-        // if(this.persistAction){
-          this.status.focusIcon = !this.status.focusIcon;
-        // }
-        this.term.status = this.status;
-        this.status.includeIcon = true;
-        this.$emit('focus', this.term)
-      },
-      pin: function(){
-        // if(this.persistAction){
-          this.status.pinnedIcon = !this.status.pinnedIcon;
-        // }
-        this.status.includeIcon = true;
-        this.term.status = this.status;
-        this.$emit('pin', this.term)
-      },
-      lens: function(){
-        if(this.persistAction){
-          this.status.lensIcon = !this.status.lensIcon;
-        }
-        this.term.status = this.status;
-        this.$emit('lens', this.term)
-      },
-      delayHover: function(){
-        this.left=false;
-        window.setTimeout(()=>{
-          if(!this.left){
-              this.hovering=true
-          }
-        }, 150)
-      },
-      leave: function(){
-        this.left=true;
-        this.hovering=false;
-      }
-    },
-    mounted: function(){
-      this.$emit('created')
-      if(this.term.status){
-        this.status=this.term.status;
-      }
-      if(this.$parent.$el && this.$parent.$el._prevClass==='termQuery'){ // stupid way to change css. cake component param/option instead
-        this.inSidebar = true; // defaults to false
-      }
-
-      // setup info dropdown
-      $(".dd"+this.term.setID).dropdown({
-          alignment: 'right',
-          hover: true
-        }
-      );
-
-
+    persistAction: {
+      type: Boolean,
+      default: true
     }
+  },
+  data: () => {
+    return {
+      inSidebar: false,
+      hovering: false,
+      status: {
+        pinnedIcon: false,
+        includeIcon: false,
+        excludeIcon: false,
+        removeIcon: false,
+        focusIcon: false,
+        infoIcon: false,
+        lensIcon: false
+      }
+    }
+  },
+  methods: {
+    name (uid, val) {
+      this.$http.put('/god/name/' + uid + '/' + val).then(response => {
+        if (response.body) {
+          Materialize.toast('changed name', 4000)
+        } else {
+          Materialize.toast('Something went wrong...', 4000)
+        }
+      }, response => {
+        Materialize.toast('Something went wrong...are you online?', 4000)
+      })
+    },
+    order (termID, order) {
+      console.log(termID, order)
+      this.$http.put('/god/order/' + termID + '/' + order + '/' + this.$route.params.uid).then(response => {
+        if (response.body) {
+          Materialize.toast('changed order', 4000)
+        } else {
+          Materialize.toast('Something went wrong...', 4000)
+        }
+      }, response => {
+        Materialize.toast('Something went wrong...are you online?', 4000)
+      })
+    },
+    termAction (action) {
+
+    },
+    main () {
+      if (this.persistAction) {
+        this.status.includeIcon = !this.status.includeIcon
+      }
+      this.term.status = this.status
+      this.$emit('main', this.term)
+    },
+    remove () {
+      if (this.persistAction) {
+        this.status.removeIcon = !this.status.removeIcon
+      }
+      this.term.status = this.status
+      this.$emit('remove', this.term)
+    },
+    include () {
+      // if (this.persistAction) {
+      this.status.includeIcon = !this.status.includeIcon
+      // }
+      this.term.status = this.status
+      this.$emit('include', this.term)
+    },
+    exclude () {
+      if (this.persistAction) {
+        this.status.excludeIcon = !this.status.excludeIcon
+      }
+      this.term.status = this.status
+      this.$emit('exclude', this.term)
+    },
+    focus () {
+      // if (this.persistAction) {
+      this.status.focusIcon = !this.status.focusIcon
+      // }
+      this.term.status = this.status
+      this.status.includeIcon = true
+      this.$emit('focus', this.term)
+    },
+    pin () {
+      // if (this.persistAction) {
+      this.status.pinnedIcon = !this.status.pinnedIcon
+      // }
+      this.status.includeIcon = true
+      this.term.status = this.status
+      this.$emit('pin', this.term)
+    },
+    lens () {
+      if (this.persistAction) {
+        this.status.lensIcon = !this.status.lensIcon
+      }
+      this.term.status = this.status
+      this.$emit('lens', this.term)
+    },
+    delayHover () {
+      this.left = false
+      window.setTimeout(() => {
+        if (!this.left) {
+          this.hovering = true
+        }
+      }, 150)
+    },
+    leave () {
+      this.left = true
+      this.hovering = false
+    }
+  },
+  mounted () {
+    this.$emit('created')
+    if (this.term.status) {
+      this.status = this.term.status
+    }
+    if (this.$parent.$el && this.$parent.$el._prevClass === 'termQuery') { // stupid way to change css. cake component param/option instead
+      this.inSidebar = true // defaults to false
+    }
+
+    // setup info dropdown
+    $('.dd' + this.term.setID).dropdown({
+      alignment: 'right',
+      hover: true
+    })
+  }
 }
 </script>
