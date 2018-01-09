@@ -2,7 +2,7 @@ module.exports = function(app, db){
 
 var shortid = require('shortid');
 
-app.get('/term/autocomplete/:text/:exclude?', autocomplete);
+app.get('/term/search/:text/:exclude?', search);
 app.get('/term/most', most);
 
 // translation
@@ -591,7 +591,7 @@ function containsByGroup(req, res){
 */
 
 
-function autocomplete(req,res){
+function search(req,res){
 
   var properties = {
     code: 'en',

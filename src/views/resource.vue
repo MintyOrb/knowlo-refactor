@@ -141,7 +141,7 @@
           <term v-for="term in terms" :term="term" :key="term.setID" display="list" v-on:include="addToQuery(term); close();" v-on:remove="removeTerm(term.setID)" v-on:focus="addToQuery(term); close();" v-on:pin="addToQuery(term); close();">
           </term>
         </isotope>
-        <autocomplete exclude="" input-id="resourceTest" v-on:select="addTerm"></autocomplete>
+        <search exclude="" input-id="resourceTest" v-on:select="addTerm"></search>
       </div>
       <!-- related -->
       <div class="resourceStep discussion">

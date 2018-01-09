@@ -71,7 +71,7 @@
 
   </div>
   <div v-if="type==='discussion' || type==='resource'" class="addContainer">
-  <autocomplete exclude="" input-id="tagNewResources" v-on:select="addTag"></autocomplete>
+  <search exclude="" input-id="tagNewResources" v-on:select="addTag"></search>
   <div v-if='type==="discussion"'>
   <div class='disSwitch center'>
    					 <div class="switch">

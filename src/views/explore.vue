@@ -12,7 +12,7 @@
 
     <li data-pane="search" id='search'>
       <div class="collapsible-header searchHead">
-        <autocomplete exclude="" input-id="mainSearch" holder-text="Search" v-on:select="addToQuery"></autocomplete>
+        <search exclude="" input-id="mainSearch" holder-text="Search" v-on:select="addToQuery"></search>
 
         <transition-group name='fade'>
           <span v-for="term in termQuery" @click.stop.prevent='removeTerm(term.setID)' :key="term.setID">
@@ -199,7 +199,7 @@
                 <resource v-for="re in resources" :key="re.resource.uid" :re="re" :display="resourceDisplay" :class="{'listFullWidth': resourceDisplay=='list'}" :voting='false'>
                 </resource>
               </isotope>
-              <vue-simple-spinner v-show='loadingResources'></vue-simple-spinner>
+              <Spinner v-show='loadingResources'></Spinner>
             </div>
           </transition>
 
@@ -230,9 +230,14 @@ import Materialize from 'materialize-css'
 import Router from 'vue-router'
 import token from '@/components/token'
 import resource from '@/components/resource'
+import search from '@/components/search'
+import infiniteScroll from 'vue-infinite-scroll'
+import Spinner from 'vue-simple-spinner'
+import isotope from 'vueisotope'
 export default {
-  name: 'exploreComp',
-  components: [token, resource],
+  name: 'explore',
+  components: { token, resource, search, Spinner, isotope },
+  directives: {infiniteScroll},
   props: ['termQuery', 'member'],
   data () {
     return {

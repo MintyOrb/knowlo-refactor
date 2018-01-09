@@ -60,7 +60,7 @@
           <term v-for="term in synonyms" :key="term.setID" :term="term" :display="termDisplay" v-on:include="addToQuery(term)" v-on:exclude="removeSynonym(term.term.uid)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)" hide="remove">
           </term>
         </isotope>
-        <autocomplete :exclude="$route.params.uid" input-id="syn" v-on:select="addSynonym"></autocomplete>
+        <search :exclude="$route.params.uid" input-id="syn" v-on:select="addSynonym"></search>
       </div>
       <div class="stepContainer">
         <isotope ref='withn' :list="within" :options='{}'>
@@ -68,7 +68,7 @@
           </term>
           <!-- v-on:exclude="removeSynonym(term.term.uid)" -->
         </isotope>
-        <autocomplete exclude="" input-id="within" v-on:select="addWithin"></autocomplete>
+        <search exclude="" input-id="within" v-on:select="addWithin"></search>
       </div>
       <div class="stepContainer">
         <isotope ref='contains' :list="contains" :options='{}'>
@@ -76,7 +76,7 @@
           </term>
           <!-- v-on:exclude="removeSynonym(term.term.uid)" -->
         </isotope>
-        <autocomplete exclude="" input-id="contains" v-on:select="addContains"></autocomplete>
+        <search exclude="" input-id="contains" v-on:select="addContains"></search>
       </div>
       <div class="stepContainer">
         <isotope ref='trans' :list="translations" :options='{}'>
@@ -94,6 +94,7 @@ import $ from 'jquery'
 import Materialize from 'materialize-css'
 import Router from 'vue-router'
 export default {
+  name: 'token',
   props: ['termQuery', 'member'],
   data: function () {
     return {

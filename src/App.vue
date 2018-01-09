@@ -25,7 +25,7 @@
   </div>
 
 
-  <sidebar :member="member"></sidebar>
+  <sidemenu :member="member"></sidemenu>
 
 
   <!-- TODO: make component  firebase login-->
@@ -61,17 +61,16 @@
 
 <script>
 import Vue from 'vue'
-import Materialize from 'materialize-css'
 import $ from 'jquery'
+import Materialize from 'materialize-css'
 import Headroom from 'headroom.js'
 import Cookies from 'js-cookie'
 import firebase from 'firebaseui'
-import token from '@/components/token'
-import resource from '@/components/resource'
+import sidemenu from '@/components/sideMenu'
 
 export default {
   name: 'app',
-  components: [token, resource],
+  components: { sidemenu },
   data () {
     return {
       member: {

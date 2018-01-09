@@ -20,31 +20,31 @@
 	</ul>
 </template>
 <script>
-{
-  name: "sideMenu",
+import firebase from 'firebaseui'
+import $ from 'jquery'
+export default {
+  name: 'sidemenu',
   props: ['member'],
-  methods:{
-    loginModal: function(){
-      $('#login-modal').modal('open');
+  methods: {
+    loginModal () {
+      $('#login-modal').modal('open')
     },
-    signOut: function(){ // since this is a child component, probably should be emitting an event and using the signout method on main instead...
-      firebase.auth().signOut().then(function() {
-      // Sign-out successful.
-      }, function(error) {
-        console.log('an error...')
-      // An error happened.
-      });
+    signOut () { // since this is a child component, probably should be emitting an event and using the signout method on main instead...
+      firebase.auth().signOut().then(() => {
+        // Sign-out successful...
+      }, (error) => {
+        console.log('an error...', error)
+        // An error happened.
+      })
     }
   },
-  created: function(){
-    this.$nextTick(function(){
+  created () {
+    this.$nextTick(() => {
       $('.navbar-collapse').sideNav({
-          closeOnClick: true, // Closes side-nav on <a> clicks, useful for Angular/Meteor
-          draggable: true // Choose whether you can drag to open on touch screens
-        }
-      );
+        closeOnClick: true, // Closes side-nav on <a> clicks, useful for Angular/Meteor
+        draggable: true // Choose whether you can drag to open on touch screens
+      })
     })
-
   }
 }
 </script>
