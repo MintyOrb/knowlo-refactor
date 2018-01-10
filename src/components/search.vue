@@ -1,9 +1,9 @@
-<template>
+f<template>
   <div class="input-field ">
 		<i class="material-icons prefix">search</i>
 		<input type="text" v-on:click.stop.prevent="" :id="inputId" class="search" v-model="input" @blur="hide" @focus="hidden=false">
 		<label :for="inputId" >{{holderText}}</label>
-		<ul id="ac" class="search-content dropdown-content" style="position:absolute" :class="{ hide: hidden, 'searchDrop': $route.name=='explore' }">
+		<ul id="ac" class="dropdown-content" style="position:absolute" :class="{ hide: hidden, 'searchDrop': $route.name=='explore' }">
 			<li v-for="suggestion in suggestions" @click.stop.prevent='pick(suggestion)'>
 				<img v-if="suggestion.term.iconURL" :src="suggestion.term.iconURL" class="left">
 				<span><i v-if="suggestion.new" class='material-icons  left'>add</i>{{suggestion.translation.name}}<span v-if="$route.name !='addTerm' && suggestion.new" @click="addWithDetail = true"><i class='material-icons right addDetail'>playlist_add</i></span></span>
@@ -185,3 +185,31 @@ export default {
   }
 }
 </script>
+
+<style>
+  .input-field input[type=text]:focus+label {
+      color: black;
+  }
+  .input-field input[type=text]:focus {
+      border-bottom: 1px solid black;
+      box-shadow: none;
+  }
+  .input-field .prefix.active {
+    color: #2196F3;
+  }
+  .searchDrop{
+  width:80vw;
+  right:10vw;
+  margin-top:0px;
+}
+.addDetail{
+  padding: 5px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background-color: white;
+  transition: background-color .3s;
+}
+.addDetail:hover{
+  background-color:rgb(210, 210, 210);
+}
+</style>

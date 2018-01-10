@@ -48,3 +48,10 @@ export default {
   }
 }
 </script>
+
+<style>
+.side-nav{
+  z-index: 1006;
+}
+
+</style>

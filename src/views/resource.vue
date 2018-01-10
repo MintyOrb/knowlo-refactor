@@ -1,5 +1,5 @@
 <template :member="member" >
-<div style="opacity:0" :id="'resourceModal'+resource.uid" class="modal fullPage resource-modal">
+<div style="opacity:0" :id="'resourceModal'+resource.uid" class="modal fullPage">
   <span class="exit hide-on-med-and-down modal-close"><i class="fa fa-3x fa-times"></i></span>
 
   <!-- modal for adding to discussion -->
@@ -54,7 +54,7 @@
   <div class="resourceMeta">
     <div class="metaNav">
       <!-- flick navigation for isotope containers -->
-      <div v-for="step in resourceSection" class="navItems">
+      <div v-for="step in resourceSection">
         <p>
           {{step}}
         </p>
@@ -64,7 +64,7 @@
     <div class="resourceSections">
       <!-- discussion -->
       <div class="resourceStep discussion">
-        <div class="center pad margin20">
+        <div class="center margin20">
           <span class="left" style="margin-right:15px"><i class="material-icons ">remove_red_eye</i></span>
           <span class="viewBtn" @click="changeDisplay('list')"><i class="material-icons">view_list</i></span>
           <span class="viewBtn" @click="changeDisplay('card')"><i class="material-icons">dashboard</i></span>
@@ -120,7 +120,7 @@
             <a @click="addResourceType='discussion'; addResource = true;" class="hoverable btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
           </div>
         </div>
-        <isotope v-else ref="discussionBin" class="step" :list="discussion" :options='discussionIsotope()' id="container">
+        <isotope v-else ref="discussionBin" :list="discussion" :options='discussionIsotope()' id="container">
           <resource :key="re.resource.uid" v-for="re in discussion" :re="re" :class="{'fullWidth': discussionDisplay=='list'}" :display="discussionDisplay">
           </resource>
         </isotope>
@@ -135,7 +135,7 @@
           Description: {{resource.description}}
         </div>
       </div>
-      <!-- tokens -->
+      <!-- tags -->
       <div class="resourceStep">
         <isotope ref='rTermBin' :list="terms" :options='{}'>
           <term v-for="term in terms" :term="term" :key="term.setID" display="list" v-on:include="addToQuery(term); close();" v-on:remove="removeTerm(term.setID)" v-on:focus="addToQuery(term); close();" v-on:pin="addToQuery(term); close();">
@@ -145,7 +145,7 @@
       </div>
       <!-- related -->
       <div class="resourceStep discussion">
-        <isotope ref='relatedBin' class="step" :list="related" :options='{}'>
+        <isotope ref='relatedBin' :list="related" :options='{}'>
           <resource v-for="re in related" :re="re" :key="re.resource.uid" :display="'card'" :voting='false'></resource>
         </isotope>
       </div>
@@ -172,7 +172,7 @@ export default {
       discussion: [], // resources within discussion
       related: [], // resources related to current resource
       discussionDisplay: 'card', // default display for discussion
-      resourceSection: ['Discussion', 'Detail', 'Tokens', 'Related'],
+      resourceSection: ['Discussion', 'Detail', 'tags', 'Related'],
       addResource: false,
       addResourceType: '',
       modalOpen: false,
@@ -464,3 +464,113 @@ export default {
   }
 }
 </script>
+
+<style>
+.resource-container {
+  height: auto;
+  width: 100vw;
+  margin: auto;
+}
+.vid-container-container {
+  margin:auto;
+  width:80vw;
+}
+
+.resourceMeta {
+  height: 100%;
+  position: relative;
+  width: 100vw;
+}
+.web-container iframe, .video-container object, .video-container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+}
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 30px;
+    height: 0;
+    overflow: hidden;
+}
+.video-container iframe, .video-container object, .video-container embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.resourceSections{
+  height: 100%;
+}
+.resourceStep {
+  width: 25vw;
+	height: 100%;
+  overflow: scroll;
+  padding-top: 10px;
+}
+.disSwitch div {
+  display: inline;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 100px;
+}
+.disSwitch {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+.switch label input[type=checkbox]:checked+.lever {
+    background-color: #8cc3ee;
+}
+.switch label input[type=checkbox]:checked+.lever:after {
+    background-color: #2196F3;
+}
+.fullWidth{
+  width: calc(100% - 60px);
+}
+.addBtn {
+  position: absolute;
+  z-index: 998;
+  bottom: -5px;
+  right: 10%;
+}
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen
+and (min-device-width : 320px)
+and (max-device-width : 480px) { /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+  .vid-container-container {
+    margin:auto;
+    width:100vw;
+  }
+  .text-container{
+    padding: 10px;
+    font-size: 20px;
+  }
+}
+.text-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-size: 40px;
+  font-weight: 200;
+  color: white;
+  padding: 30px;
+}
+
+#image-map {
+  width: 100vw;
+  height: 80vh;
+}
+.resource-container {
+  background-color: black;
+  width: 100vw;
+  z-index: 999;
+}
+iframe{
+  border-width: 0;
+}
+</style>

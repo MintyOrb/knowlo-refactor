@@ -44,7 +44,6 @@
     <router-view :term-query="termQuery" :member="member" style="padding-top:90px" />
   </transition>
 
-  <!-- TODO: make component: footer -->
   <footer class="page-footer blue">
     <div class="container">
       <div class="row">
@@ -169,8 +168,8 @@ export default {
       if (member) {
         this.member = member
         this.member.first = member.displayName.substr(0, member.displayName.indexOf(' ')) // get first name -  if there is no space at all, then the first line will return an empty string and the second line will return the entire string
-        member.getIdToken().then((accessToken) => {
-          Vue.http.headers.common['Authorization'] = 'Bearer ' + accessToken
+        member.getIdtag().then((accesstag) => {
+          Vue.http.headers.common['Authorization'] = 'Bearer ' + accesstag
           this.touchMember()
           // bus.$emit('login', member)
         })
@@ -189,3 +188,249 @@ export default {
 </script>
 <style src="materialize-css/dist/css/materialize.css"></style>
 <style>
+<style>
+.modal .modal-content {
+  padding: 0px;
+}
+.margin20 {
+	margin:20px;
+}
+.modal {
+  top: 0!important;
+  max-height: 100%!important;
+  width: 100%!important;
+  height: 100%!important;
+}
+.modal-overlay {
+  height: 100vh;
+  position: sticky;
+}
+.fullPage{
+  z-index: 1001;
+  top: 0!important;
+  width: 100vw;
+  height: 100%;
+  max-height: none;
+  display: block;
+  overflow: scroll;
+}
+.exit {
+  border-bottom-left-radius: 6px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  padding-right: 8px;
+  padding-top: 2px;
+  color: black;
+  background-color: white;
+  padding-left: 7px;
+  padding-bottom: 4px;
+}
+.exit:hover{
+  cursor: pointer;
+}
+.memberTitle div {
+  font-weight: 200;
+  color:black;
+  font-size: 30px;
+  padding-top:20px;
+}
+.metaNav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: white;
+  box-shadow: 0 5px 5px 0 rgba(0,0,0,0.2), 0 7px 11px 0 rgba(0,0,0,0.19);
+}
+.message {
+  font-size: 30px;
+  font-weight: 300;
+  text-align: center;
+  margin: 100px;
+  background-color: #ececec;
+  border-radius: 10px;
+  padding: 45px;
+}
+/* in member and nav */
+.resourceSections{
+  height: 100%;
+}
+.resourceStep {
+  width: 25vw;
+	height: 100%;
+  overflow: scroll;
+  padding-top: 10px;
+}
+.viewBtn {
+  transition: color .3s;
+}
+.viewBtn:hover {
+  cursor: pointer;
+  color: gray;
+}
+.disabled {
+  background-color: #eee!important;
+  color: gray!important;
+}
+.disabled:hover {
+  cursor: not-allowed!important;
+  background-color: #eee!important;
+}
+/* dots are lines */
+.flickity-page-dots .dot {
+  height: 4px;
+  width: 40px;
+  margin: 0px;
+  border-radius: 0;
+}
+
+.flickContainer{
+	position: relative;
+	border-right: 1px solid darkgray;
+	border-left: 1px solid darkgray;
+	width: 100%;
+	margin:15px;
+}
+.flickItem{
+	margin-left: 15px;
+	margin-right: 15px;
+	margin-top: 10px;
+}
+.flickity-page-dots {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  bottom: 0px;
+}
+.input-field{
+  margin-top: 0;
+  /*width: 80vw;*/
+  max-width: 100%;
+}
+input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default), input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default), input[type=tel]:not(.browser-default), input[type=number]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea {
+  margin-bottom:0;
+}
+_:-moz-tree-row(hover), .card {
+    width: calc(20% - 15px);
+}
+ @media only screen
+and (min-width : 768px)
+and (max-width : 1024px) { _:-moz-tree-row(hover),
+  .card{
+    width: calc(25% - 15px);
+  }
+}
+.login-head {
+    text-align: center;
+    margin: 20px!important;
+    font-weight: 300;
+}
+.fade {
+  color:#a8a8a8;
+}
+.noUi-target.noUi-horizontal .noUi-tooltip {
+  background-color: #2196F3;
+}
+.noUi-connect{
+  background-color: #2196F3;
+}
+.hidden{
+  visibility: hidden;
+}
+/*hide scroll bars*/
+::-webkit-scrollbar {
+    display: none;
+}
+html {
+  -ms-overflow-style: none;
+}
+.bold {
+	font-weight: 700;
+}
+.dropdown-content li>a {
+	color: #2196F3
+}
+.dropdown-content li>span {
+  color: #2196F3;
+}
+.dropdown-content {
+  z-index: 2000;
+}
+.modal {
+  display: flex!important;
+}
+[v-cloak] { display: none }
+.headroom {
+    will-change: transform;
+    transition: transform 200ms linear;
+}
+.headroom--pinned {
+    transform: translateY(0%);
+    box-shadow: 0 5px 5px 0 rgba(0,0,0,0.2), 0 7px 11px 0 rgba(0,0,0,0.19);
+}
+.headroom--unpinned {
+    transform: translateY(-100%);
+}
+
+#nav-slide{
+  position: fixed;
+  width: 100vw;
+}
+#nav-slide ul {
+  margin-left: 13px;
+}
+#navName {
+  color:#2196F3;
+  font-size: 38px;
+  font-weight: 200;
+  text-align: center;
+  margin:20px;
+}
+@media only screen
+and (max-width : 375px) {
+  .card{
+    width: calc(100% - 10px);
+  }
+}
+/* Smartphones (landscape) ----------- */
+@media only screen
+and (min-width : 376px)
+and (max-width : 767px) {
+  .card{
+    width: calc(50% - 10px);
+  }
+}
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen
+and (min-device-width : 320px)
+and (max-device-width : 480px) { /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+
+    .definition{
+      width:100vw!important;
+    }
+    .discussion{
+      width:100vw!important;
+    }
+    .stepContainer{  width: 100vw;}
+    .addContainer{
+      padding-top: 200px;
+      padding-bottom: 100px;
+      padding-left: 50px;
+      padding-right: 50px;
+    }
+    .resourceStep{ width:100vw!important;}
+}
+/* iPads (portrait and landscape) ----------- */
+@media only screen
+and (min-width : 768px)
+and (max-width : 1024px) {
+  /* .card{
+    width: calc(25% - 10px);
+  } */
+  .rchart {
+    margin: auto;
+    width: 90%;
+  }
+}
+</style>

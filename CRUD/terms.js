@@ -145,7 +145,7 @@ function query(req, res){
   })
 }
 
-// using any token uid for cross section
+// using any tag uid for cross section
 // returns object with two arrays or array of objects
 function crossSection(req, res){
   var cypher = "MATCH (coreSet:synSet {uid: {coreID} })<-[r:IN_SET]-(member:synSet) "
@@ -156,7 +156,7 @@ function crossSection(req, res){
              + "memLang.languageCode IN [ {language} , 'en' ] AND memR.order=1  "
              + "AND inLang.languageCode IN [ {language} , 'en' ] AND inR.order=1  "
              + "WITH r, member, memTrans, COLLECT({term: inMembers, translation: inTrans, setID: inMembers.uid}) AS contains "
-             // TODO: where inMebmer->ids of filter token (ex just concepts)
+             // TODO: where inMebmer->ids of filter tag (ex just concepts)
              + "RETURN DISTINCT r, COLLECT({setID: member.uid, translation: memTrans, term: member}) AS group,  "
              + "contains "
              + "ORDER BY  r.order"
@@ -564,7 +564,7 @@ function deleteContains(req, res){
     }
   })
 }
-// get tokens contained by another, organized by the returned tokens groups
+// get tags contained by another, organized by the returned tags groups
 function containsByGroup(req, res){
   // var cypher = "MATCH (set:synSet {uid: {set} })<-[sr:IN_SET]-(syn:synSet), "
   //                + "(syn)<-[tr:IN_SET]-(t:term)-[lang:HAS_TRANSLATION]->(translation:translation) "

@@ -8,8 +8,8 @@ module.exports = function(app, db){
   app.get('/resource/count', count);                   // query number of resources related to terms
   app.get('/api/resource/count', memberCount);         // query number of resources related to terms; return number seen by member;  based on user details and provided term IDs
 
-  app.get('/resource/random', random);                 // send back id for random resource, tagged with provided tokens
-  // app.get('/api/resource/random', memberRandom);             // send back id for random resource, tagged with provided tokens. Option for only unseen.
+  app.get('/resource/random', random);                 // send back id for random resource, tagged with provided tags
+  // app.get('/api/resource/random', memberRandom);             // send back id for random resource, tagged with provided tags. Option for only unseen.
 
   app.get('/resource/:uid/full', readFull);            // read full details of a single resource (tagged terms and translation by language code)
   app.put('/api/resource/:uid/full', updateFull);      // update full details of a single resource (tagged terms and translation by language code)
@@ -529,7 +529,7 @@ module.exports = function(app, db){
 
   function suggestedTerms(req, res){ // finds and tags terms to resource based on provided text - returns terms tagged
     var blob = req.body.text;
-      var tokens =[]
+      var tags =[]
       var nospecial = blob.replace(/[^a-zA-Z0-9 ]/g, "");
       var split = nospecial.split(' ')
       var stop = ["undefined","a", "about", "above", "above", "across", "after", "afterwards", "again", "against", "all", "almost", "alone", "along", "already", "also","although","always","am","among", "amongst", "amoungst", "amount",  "an", "and", "another", "any","anyhow","anyone","anything","anyway", "anywhere", "are", "around", "as",  "at", "back","be","became", "because","become","becomes", "becoming", "been", "before", "beforehand", "behind", "being", "below", "beside", "besides", "between", "beyond", "bill", "both", "bottom","but", "by", "call", "can", "cannot", "cant", "co", "con", "could", "couldnt", "cry", "de", "describe", "detail", "do", "done", "down", "due", "during", "each", "eg", "eight", "either", "eleven","else", "elsewhere", "empty", "enough", "etc", "even", "ever", "every", "everyone", "everything", "everywhere", "except", "few", "fifteen", "fify", "fill", "find", "fire", "first", "five", "for", "former", "formerly", "forty", "found", "four", "from", "front", "full", "further", "get", "give", "go", "had", "has", "hasnt", "have", "he", "hence", "her", "here", "hereafter", "hereby", "herein", "hereupon", "hers", "herself", "him", "himself", "his", "how", "however", "hundred", "ie", "if", "in", "inc", "indeed", "interest", "into", "is", "it", "its", "itself", "keep", "last", "latter", "latterly", "least", "less", "ltd", "made", "many", "may", "me", "meanwhile", "might", "mill", "mine", "more", "moreover", "most", "mostly", "move", "much", "must", "my", "myself", "name", "namely", "neither", "never", "nevertheless", "next", "nine", "no", "nobody", "none", "noone", "nor", "not", "nothing", "now", "nowhere", "of", "off", "often", "on", "once", "one", "only", "onto", "or", "other", "others", "otherwise", "our", "ours", "ourselves", "out", "over", "own","part", "per", "perhaps", "please", "put", "rather", "re", "same", "see", "seem", "seemed", "seeming", "seems", "serious", "several", "she", "should", "show", "side", "since", "sincere", "six", "sixty", "so", "some", "somehow", "someone", "something", "sometime", "sometimes", "somewhere", "still", "such", "system", "take", "ten", "than", "that", "the", "their", "them", "themselves", "then", "thence", "there", "thereafter", "thereby", "therefore", "therein", "thereupon", "these", "they", "thickv", "thin", "third", "this", "those", "though", "three", "through", "throughout", "thru", "thus", "to", "together", "too", "top", "toward", "towards", "twelve", "twenty", "two", "un", "under", "until", "up", "upon", "us", "very", "via", "was", "we", "well", "were", "what", "whatever", "when", "whence", "whenever", "where", "whereafter", "whereas", "whereby", "wherein", "whereupon", "wherever", "whether", "which", "while", "whither", "who", "whoever", "whole", "whom", "whose", "why", "will", "with", "within", "without", "would", "yet", "you", "your", "yours", "yourself", "yourselves", "the"];
@@ -537,13 +537,13 @@ module.exports = function(app, db){
         return stop.indexOf(word)===-1
       })
 
-      for (var i = 0; i < split.length; i++) { // create one and two word tokens from text
-        tokens.push(split[i].toLowerCase().trim())
-        tokens.push((split[i]+" "+split[i + 1]).toLowerCase().trim())
+      for (var i = 0; i < split.length; i++) { // create one and two word tags from text
+        tags.push(split[i].toLowerCase().trim())
+        tags.push((split[i]+" "+split[i + 1]).toLowerCase().trim())
       }
-      let uniqueTokens = Array.from(new Set(tokens)); // remove duplicates
-      async.concat(uniqueTokens, function(token, callback) {
-        tagResource(req.params.rUID, token, function(err, result){
+      let uniquetags = Array.from(new Set(tags)); // remove duplicates
+      async.concat(uniquetags, function(tag, callback) {
+        tagResource(req.params.rUID, tag, function(err, result){
             if(err){console.log(err)}
             callback(null,result)
         })

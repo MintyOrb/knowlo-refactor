@@ -1,5 +1,5 @@
 <template :member='member'>
-<div style="opacity:0" :id="'memberModal'+member.uid" class="modal fullPage member-modal">
+<div style="opacity:0" :id="'memberModal'+member.uid" class="modal fullPage ">
   <span class="exit modal-close"><i class="fa fa-3x fa-times"></i></span>
 
   <div class="member-container memberTitle center">
@@ -9,7 +9,7 @@
   <div class="memberMeta">
     <div class="metaNav">
       <!-- flick navigation for isotope containers -->
-      <div v-for="step in memberSection" class="navItems">
+      <div v-for="step in memberSection">
         <p>
           {{step}}
         </p>
@@ -18,7 +18,7 @@
     <!-- flick contianers -->
     <div class="resourceSections">
 
-      <div class="resourceStep discussion">
+      <div class="resourceStep">
         <radar class="rchart" :data="scale.data" :data-label="scale.dataLabel" :labels="scale.labels"></radar>
         <isotope ref='scale' :list="scale.all" :options='{}'>
           <div v-for="term in scale.all" :key="term.setID">
@@ -47,7 +47,7 @@
       </div>
 
       <div class="resourceStep discussion">
-        <isotope ref='seenBin' class="step" :list="history" :options='{}'>
+        <isotope ref='seenBin' :list="history" :options='{}'>
           <resource v-for="re in history" :re="re" :key="re.resource.uid" :display="'list'" :voting='false'>
           </resource>
         </isotope>
@@ -222,3 +222,49 @@ export default {
   }
 }
 </script>
+
+<style>
+
+.member-container{
+  height: 80px;
+  background-color: white;
+}
+.memberStep {
+  width: 30vw;
+}
+.memberMeta {
+  height: 100vh;
+  position: relative;
+  width: 100vw;
+}
+.about div {
+  font-weight: 200;
+  margin:30px;
+  font-size: 20px;
+}
+.about span {
+  font-weight: 300;
+}
+.rchart {
+  margin: auto;
+  width: 50%;
+}
+/* iPads (portrait and landscape) ----------- */
+@media only screen
+and (min-width : 768px)
+and (max-width : 1024px) {
+  .rchart {
+    margin: auto;
+    width: 90%;
+  }
+}
+@media only screen
+and (min-device-width : 320px)
+and (max-device-width : 480px) { /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+
+    .rchart {
+      margin: auto;
+      width: 90%;
+    }
+  }
+</style>

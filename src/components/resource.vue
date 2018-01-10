@@ -7,7 +7,7 @@ y === '<template>
 		>
 		<!-- <div style='height:20px;'@click.stop.prevent='' class='right boo' data-activates='reOptions' data-hover='true' data-alignment='right'><i class='material-icons'>more_horiz</i></div>
 		<ul id='reOptions' class='dropdown-content'>
-			<li>add token</li>
+			<li>add tag</li>
 			<li>expand</li>
 			<li>shrink</li>
 			<li>vote</li>
@@ -75,7 +75,7 @@ y === '<template>
 			</span>
  		</div>
 
-		<div class='' v-if='display === "godMode"'>
+		<div v-if='display === "godMode"'>
 			<input v-model='re.resource.uid'></input>
 
 			<input type="text" v-if='re.resource.title' v-model='re.resource.title' v-on:blur="" />
@@ -246,3 +246,121 @@ export default {
   }
 }
 </script>
+
+<style>
+.resource a {color:black}
+.list span {
+  font-size: 15px;
+}
+.list {
+    padding: 1% 1% 0% 2%;
+    width: 94%;
+    margin-left: 3%;
+    min-height: 40px;
+    font-size: 20px;
+    display: inline-block;
+}
+.card {
+    width: 20%;
+    padding: 15px;
+		box-shadow: none;
+}
+.card-bottom {
+    margin: -11px;
+}
+.card-bottom i {
+    vertical-align: middle;
+    margin-bottom: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+.card .card-content {
+    padding-bottom: 3px;
+    padding-top: 14px;
+}
+.card .card-action {
+		border-top: none
+}
+.thumb {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+}
+.thumb img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 100%;
+  width: auto;
+  -webkit-transform: translate(-50%,-50%);
+      -ms-transform: translate(-50%,-50%);
+          transform: translate(-50%,-50%);
+}
+.title {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: .1;
+}
+.inline {
+  display: inline-block;
+  min-height: 42px;
+}
+.mb{
+  margin-bottom: 12px;
+}
+.item {
+  display: inline-block;
+}
+.subtitle {
+  font-size:14px;
+}
+.tmargin {
+  margin-bottom: -12px;
+}
+.rText{
+  font-size: 20px;
+  font-weight: 300;
+  padding:20px;
+}
+.rating{
+  opacity: .4;
+  transition: opacity .5s;
+}
+.rating:hover{
+  opacity: 1;
+}
+.rating.selected {
+  opacity: 1;
+}
+.card{
+  margin: 5px;
+  padding: 0px;
+}
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen
+and (min-device-width : 320px)
+and (max-device-width : 480px) { /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+  .list {
+      width: 100%;
+      margin-left: 0%;
+    }
+  }
+  /* iPads (portrait and landscape) ----------- */
+@media only screen
+and (min-width : 768px)
+and (max-width : 1024px) {
+  .card{
+    width: calc(25% - 10px);
+  }
+}
+/* Desktops and laptops ----------- */
+@media only screen
+and (min-width : 1224px) {
+  .card{
+    width: calc(20% - 10px);
+  }
+}
+
+</style>

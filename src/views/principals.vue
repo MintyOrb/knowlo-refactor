@@ -28,7 +28,7 @@
 					<div id="ReciprocalSharing" class="section scrollspy">
 		        <h5>Reciprocal Sharing </h5>
 						<p>Sharing of any personal details is completely optional. However, to see any information about other members, whether in cumulative community demographics or in discussion, you must first share that information about yourself.</p>
-						<p>This includes things like stats on members activity on knowlo (date joined, resources viewed, time spent by token, etc) as well as member's backgrounds, expertise, incomes, interests, approximate age, sex, and approximate location.</p>
+						<p>This includes things like stats on members activity on knowlo (date joined, resources viewed, time spent by tag, etc) as well as member's backgrounds, expertise, incomes, interests, approximate age, sex, and approximate location.</p>
 						<p>Sharing is on a per category basis. For example, if you choose to share your interests, but not your sex, you will then be able to see the interests of other members, but will not be able to see any members sex.</p>
 						<p>Of course, you can choose to share without reciprocation as well. For example, if you're sharing evidence of your expertise in an area, you can allow that information to be shared with people that have not provided evidence of their own expertise.</p>
 		      </div>
@@ -61,3 +61,21 @@ export default {
   }
 }
 </script>
+
+<style>
+.prince {
+  margin-left: 20px;
+  margin-right: 20px;
+  display: flow-root;
+}
+.prince h5 {
+  font-weight:300;
+}
+.prince p {
+  font-weight:300;
+}
+.table-of-contents-holder {
+  position: sticky;
+  top: 100px;
+}
+</style>

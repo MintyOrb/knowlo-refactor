@@ -8,7 +8,7 @@ import member from '@/views/member'
 import principals from '@/views/principals'
 import resource from '@/views/resource'
 import status from '@/views/status'
-import token from '@/views/token'
+import tag from '@/views/tag'
 import addResource from '@/components/addResource'
 
 Vue.use(Router)
@@ -24,7 +24,7 @@ export default new Router({
       children: [
         { path: '/m/:uid', component: member, name: 'member' },
         { path: '/r/:uid', component: resource, name: 'resource' },
-        { path: '/t/:name/:uid?', component: token, name: 'token' },
+        { path: '/t/:name/:uid?', component: tag, name: 'tag' },
         { path: '/addResource', component: addResource, name: 'addResource' }
       ]
     },

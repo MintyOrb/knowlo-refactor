@@ -11,3 +11,7 @@ export default {
   name: 'legal'
 }
 </script>
+
+<style>
+/* TODO: move style out of template */
+</style>

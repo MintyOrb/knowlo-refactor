@@ -12,3 +12,7 @@ export default {
   name: 'getInvolved'
 }
 </script>
+
+<style>
+/* TODO: get styles out of template */
+</style>

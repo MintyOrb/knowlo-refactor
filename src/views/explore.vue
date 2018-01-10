@@ -1,5 +1,5 @@
 <template>
-<div class='erything' style='min-height:100vh;'>
+<div style='min-height:100vh;'>
   <!-- view for term and resource page -->
   <router-view :member='member' :term-Query='termQuery' v-on:add='addToQuery'></router-view>
 
@@ -8,7 +8,7 @@
   				add resource
   		  </router-link> -->
 
-  <ul class=" exploreBins" data-collapsible="accordion">
+  <ul data-collapsible="accordion">
 
     <li data-pane="search" id='search'>
       <div class="collapsible-header searchHead">
@@ -32,9 +32,9 @@
 
         <!-- term query  -->
         <div class='row'>
-          <isotope style="min-height:150px" ref="termQuery" :list="termQuery" :options='{}' class='step'>
-            <token v-for="term in termQuery" :key="term.setID" :term="term" display="thumb" v-on:include="removeTerm(term.setID)" v-on:remove="removeTerm(term.setID)" v-on:focus="focus" v-on:lens="fetchContains" v-on:main="removeTerm(term.setID)">
-            </token>
+          <isotope style="min-height:150px" ref="termQuery" :list="termQuery" :options='{}' >
+            <tag v-for="term in termQuery" :key="term.setID" :term="term" display="thumb" v-on:include="removeTerm(term.setID)" v-on:remove="removeTerm(term.setID)" v-on:focus="focus" v-on:lens="fetchContains" v-on:main="removeTerm(term.setID)">
+            </tag>
           </isotope>
           <div v-if="termQuery.length > 0" class="clear btn white waves-light" @click="termQuery=[]">
             clear
@@ -73,21 +73,21 @@
         </form>
         <div>
           <!--  suggested -->
-          <div class=''>
+          <div >
             <!-- suggestions grouped -->
             <div v-if="suggestionDisplay !=='none'">
               <div id='suggestionNav' class=" suggestionNav " :class="{ shadowUnder : 'groups disciplines'.indexOf(suggestionDisplay) > -1}">
                 <!-- flickity navigation for isotope containers -->
-                <token v-for="group in termSuggestions" :key="group.group[0].setID" :term="group.group[0]" :display="'thumb'" :persist-action="false" hide="remove lens" v-on:include="addToQuery(group.group[0])" v-on:exclude="addToQuery(group.group[0])" v-on:focus="addToQuery(group.group[0])"
+                <tag v-for="group in termSuggestions" :key="group.group[0].setID" :term="group.group[0]" :display="'thumb'" :persist-action="false" hide="remove lens" v-on:include="addToQuery(group.group[0])" v-on:exclude="addToQuery(group.group[0])" v-on:focus="addToQuery(group.group[0])"
                   v-on:pin="addToQuery(group.group[0])">
-                </token>
+                </tag>
               </div>
               <!-- isotope contianers -->
               <div id='suggestionSteps' class=" suggestionSteps">
                 <div v-for="step in termSuggestions" class="suggestionGroupStep">
-                  <isotope :ref='"suggestionBin" + step.group[0].setID' class="step" :list="step.contains" :options='{}'>
-                    <token v-for="term in step.contains" :key="term.setID" :term="term" :display="'list'" v-on:main="addToQuery(term)" v-on:include="addToQuery(term)" v-on:exclude="addToQuery(term)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)">
-                    </token>
+                  <isotope :ref='"suggestionBin" + step.group[0].setID' :list="step.contains" :options='{}'>
+                    <tag v-for="term in step.contains" :key="term.setID" :term="term" :display="'list'" v-on:main="addToQuery(term)" v-on:include="addToQuery(term)" v-on:exclude="addToQuery(term)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)">
+                    </tag>
                   </isotope>
                 </div>
               </div>
@@ -95,7 +95,7 @@
             <!-- suggestions un-grouped filck -->
             <!-- <div v-if="'size disciplines time'.indexOf(suggestionDisplay) > -1">
   									<div id='suggestionNav' class=" suggestionNav ">
-  										<token
+  										<tag
   											v-for="term in termSuggestions"
   											:key="term.setID"
   											:term="term"
@@ -107,14 +107,14 @@
   											v-on:focus="addToQuery(term)"
   											v-on:pin="addToQuery(term)"
   										>
-                    </token>
+                    </tag>
   									</div>
   								</div> -->
             <!-- suggestions un-grouped iso -->
             <div v-if="' none '.indexOf(suggestionDisplay) > -1">
-              <isotope ref="together" :list="termSuggestions" :options='{}' class="step">
-                <token v-for="term in termSuggestions" :key="term.setID" :term="term" :display="'thumb'" v-on:main="addToQuery(term)" v-on:include="addToQuery(term)" v-on:exclude="addToQuery(term)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)">
-                </token>
+              <isotope ref="together" :list="termSuggestions" :options='{}' >
+                <tag v-for="term in termSuggestions" :key="term.setID" :term="term" :display="'thumb'" v-on:main="addToQuery(term)" v-on:include="addToQuery(term)" v-on:exclude="addToQuery(term)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)">
+                </tag>
               </isotope>
             </div>
           </div>
@@ -158,20 +158,20 @@
         </div>
         <!-- <transition name="fade">
 							<div>
-								<token v-for="term in base"
+								<tag v-for="term in base"
 									:term="term"
 									:display="'thumb'"
 									>
-								</token>
+								</tag>
 							</div>
 						</transition> -->
 
         <div v-if="crossSection">
           <div id='crossSectionNav' class=" crossSectionNav ">
             <!-- flick navigation for isotope containers -->
-            <div v-for="step in crossSection" class="navItems">
-              <token :term="step" :display="'thumb'">
-              </token>
+            <div v-for="step in crossSection">
+              <tag :term="step" :display="'thumb'">
+              </tag>
             </div>
           </div>
         </div>
@@ -183,7 +183,7 @@
               <!-- isotope contianers -->
               <div id='crossSectionSteps' class=" crossSectionSteps">
                 <div v-for="step in crossSection" class="stepContainer">
-                  <isotope :ref='"resourceBin" + step.setID' class="step" :list="resources" :options='{}'>
+                  <isotope :ref='"resourceBin" + step.setID' :list="resources" :options='{}'>
                     <resource :key="re.resource.uid" v-for="re in resources" v-if="re.termIDs.includes(step.setID)" :re="re" :display="resourceDisplay">
                     </resource>
                   </isotope>
@@ -195,7 +195,7 @@
           <!-- results all together -->
           <transition name="fade">
             <div v-if="!crossSection" v-infinite-scroll="infinite" infinite-scroll-disabled="busy" infinite-scroll-distance="10" infinite-scroll-throttle-delay="1000" infinite-scroll-immediate-check="false">
-              <isotope ref="resourceBin" class="step" :list="resources" :options='{}' id="container">
+              <isotope ref="resourceBin" :list="resources" :options='{}' id="container">
                 <resource v-for="re in resources" :key="re.resource.uid" :re="re" :display="resourceDisplay" :class="{'listFullWidth': resourceDisplay=='list'}" :voting='false'>
                 </resource>
               </isotope>
@@ -228,7 +228,7 @@ import $ from 'jquery'
 import Cookies from 'js-cookie'
 import Materialize from 'materialize-css'
 import Router from 'vue-router'
-import token from '@/components/token'
+import tag from '@/components/tag'
 import resource from '@/components/resource'
 import search from '@/components/search'
 import infiniteScroll from 'vue-infinite-scroll'
@@ -236,7 +236,7 @@ import Spinner from 'vue-simple-spinner'
 import isotope from 'vueisotope'
 export default {
   name: 'explore',
-  components: { token, resource, search, Spinner, isotope },
+  components: { tag, resource, search, Spinner, isotope },
   directives: {infiniteScroll},
   props: ['termQuery', 'member'],
   data () {
@@ -488,7 +488,7 @@ export default {
 
           if (this.termSuggestions.length === 0) {
             this.suggestionDisplay = 'disciplines'
-            Materialize.toast('No tokens found...', 2000)
+            Materialize.toast('No tags found...', 2000)
           }
           this.$nextTick(() => {
             this.initSuggestionGroupFlickity(response.body.length)
@@ -792,5 +792,139 @@ export default {
 </script>
 
 <style>
+.collapsible-header {
+  position:sticky;
+  top:0;
+  z-index: 2;
+  font-weight: 300;
+}
+.collapsible-body {
+  padding:0;
+}
+.collapsible {
+  margin:0;
+}
+.searchHead{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.hoverable {
+  box-shadow: none
+}
+.clear{
+  font-size: 11px;
+  font-weight: 300;
+  line-height: 20px;
+  border-radius: 25px;
+  padding: 0px;
+  color: black;
+  height: 2em;
+  width: 5em;
+  padding-top: 2px;
+}
+[type="radio"]:checked+label:after, [type="radio"].with-gap:checked+label:before, [type="radio"].with-gap:checked+label:after {
+    border: 2px solid #2196F3;
+}
+[type="radio"]:checked+label:after, [type="radio"].with-gap:checked+label:after {
+    background-color: #2196F3;
+}
+.suggestionNav {
+  z-index: 1;
+}
+.shadowUnder {
+  box-shadow:0 5px 5px 0 rgba(0,0,0,0.2), 0 7px 11px 0 rgba(0,0,0,0.19);
+}
+.suggestionSteps {
+  width: 100vw;
+  height: 100%;
+	height: 400px;
 
+}
+.suggestionGroupStep{
+  width: 33%;
+  overflow: scroll;
+  max-height: 100%;
+  margin-left:40px;
+  /*padding: 30px 100px 30px 100px;*/
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s
+}
+.fade-enter, .fade-leave-active{
+  opacity: 0
+}
+.dropdown-button{
+  margin-top: 5px;
+}
+.orderby{
+  color:black;
+}
+.orderby span {
+  text-transform: uppercase;
+  vertical-align: super;
+  font-size: .9em;
+}
+.orderby i{
+  transition: transform .5s;
+}
+.flipVert {
+  transform: scaleY(-1);
+}
+.sort {
+  width:150px!important;
+}
+.quantity {
+  font-weight: 300;
+  margin-right: 40px;
+}
+.crossSectionNav .flickity-page-dots {
+  margin-bottom: -23px;
+}
+.crossSectionNav .flickity-page-dots {
+  bottom: 23px;
+}
+.resourceCont {
+    margin-top:50px;
+  }
+.crossSectionNav {
+  position: sticky;
+  overflow: hidden;
+  top: -80px;
+  background-color: white;
+  z-index: 1;
+  width: 100%;
+}
+.crossSectionSteps {
+	width: 100%;
+}
+.stepContainer {
+	width: 25vw;
+	height: 100vh;
+  overflow: scroll;
+  padding-top: 30px;
+  padding-bottom: 400px;
+}
+.listFullWidth {
+  width: 100%;
+  margin-left: 0%;
+}
+#termSuggestionOptions {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+#termSuggestionOptions span {
+  margin: 10px 20px 0px 20px;
+  width: 110px;
+}
+@media only screen
+and (min-device-width : 320px)
+and (max-device-width : 480px) { /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+    .suggestionGroupStep{
+      padding: 0;
+      width: 90vw;
+    }
+  }
 </style>

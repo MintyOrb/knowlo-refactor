@@ -2,11 +2,11 @@
   <div id='addResourceModal' class='modal modal-fixed-footer'>
   <div class="addMeta modal-content">
   <div class="addNav">
-  <div class="navItems">
+  <div>
   <span>{{type}}</span>
   </div>
   <div v-if="type==='discussion' || type==='resource' " class="navItems">
-  <span>tag</span>
+  <span>Tag</span>
   </div>
   </div>
 
@@ -372,3 +372,54 @@ export default {
   }
 }
 </script>
+
+<style>
+.addSections {
+  height: 100%;
+}
+.addNav{
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 10px;
+  z-index: 1002;
+  background: #fafafa;
+  font-size: 30px;
+}
+.addContainer {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+  top: 50px;
+  padding-top: 20px;
+  padding-bottom: 100px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+nput:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]), input[type=password]:focus:not([readonly]), input[type=email]:focus:not([readonly]), input[type=url]:focus:not([readonly]), input[type=time]:focus:not([readonly]), input[type=date]:focus:not([readonly]), input[type=datetime]:focus:not([readonly]), input[type=datetime-local]:focus:not([readonly]), input[type=tel]:focus:not([readonly]), input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]) {
+  border-bottom: 1px solid #2196F3!important;
+  box-shadow: 0 1px 0 0 #2196F3!important;
+}
+input:not([type]):focus:not([readonly])+label, input[type=text]:focus:not([readonly])+label, input[type=password]:focus:not([readonly])+label, input[type=email]:focus:not([readonly])+label, input[type=url]:focus:not([readonly])+label, input[type=time]:focus:not([readonly])+label, input[type=date]:focus:not([readonly])+label, input[type=datetime]:focus:not([readonly])+label, input[type=datetime-local]:focus:not([readonly])+label, input[type=tel]:focus:not([readonly])+label, input[type=number]:focus:not([readonly])+label, input[type=search]:focus:not([readonly])+label, textarea.materialize-textarea:focus:not([readonly])+label {
+      color: #2196F3!important;
+}
+.bigtop {
+  margin-top: 50vh
+}
+#addResourceModal{
+  border-radius: 6px;
+  /*position: absolute!important;*/
+}
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen
+and (min-device-width : 320px)
+and (max-device-width : 480px) { /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+    #addResourceModal{
+      border-radius: 0px!important;
+    }
+  }
+</style>
