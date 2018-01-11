@@ -151,7 +151,7 @@
         </span>
       </div>
       <div class="collapsible-body" style="border-bottom:none;">
-        <br/>
+        <br/>ad
         <div class="right quantity">
           <div>Showing {{resources.length}} of {{resourcesRelated}}</div>
           <div v-if='member.uid'><span v-if="showViewed">Including</span><span v-else>Excluding</span> {{resourcesViewed}} viewed</div>
@@ -234,6 +234,7 @@ import search from '@/components/search'
 import infiniteScroll from 'vue-infinite-scroll'
 import Spinner from 'vue-simple-spinner'
 import isotope from 'vueisotope'
+
 export default {
   name: 'explore',
   components: { tag, resource, search, Spinner, isotope },
@@ -277,9 +278,9 @@ export default {
       }
     },
     random () {
-      this.$http.get('/resource/random').then(response => {
+      this.$http.get('/api/resource/random').then(response => {
         Router.push({
-          name: 'resourceSub',
+          name: 'resource',
           params: {
             uid: response.body.uid
           }
@@ -476,7 +477,7 @@ export default {
           include.push(this.termQuery[termIndex].setID)
         }
         this.termSuggestions = []
-        this.$http.get('/set/', {
+        this.$http.get('/api/set/', {
           params: {
             languageCode: 'en',
             include: include,
@@ -504,7 +505,7 @@ export default {
       }
       var id = scaleIDs[this.suggestionDisplay]
       this.termSuggestions = []
-      this.$http.get('/set/' + id + '/crossSection', {
+      this.$http.get('/api/set/' + id + '/crossSection', {
         params: {
           languageCode: 'en'
         }
@@ -530,7 +531,7 @@ export default {
       })
     },
     fetchContains (set) { // used in fetching resource lens...
-      this.$http.get('/set/' + set.setID + '/contains/', {
+      this.$http.get('/api/set/' + set.setID + '/contains/', {
         params: {
           languageCode: 'en'
         }
@@ -545,6 +546,7 @@ export default {
       })
     },
     fetchResources (infinite) {
+      console.log('in fetch r')
       if (!this.loadingResources && !(infinite && this.resources.length === 0)) { // don't fetch if initial resrouces hadn't had time to load to avoid ending up with top resources twice
         this.loadingResources = true
         this.endOfResources = false
@@ -566,7 +568,7 @@ export default {
           }
         }
         if (this.member.uid !== null) { // member specific query if logged in
-          this.$http.get('/api/resource', {
+          this.$http.get('/api/auth/resource', {
             params: {
               languageCode: 'en',
               include: include,
@@ -578,6 +580,7 @@ export default {
               descending: this.descending
             }
           }).then(response => {
+            console.log(response)
             if (response.body.length === 0) {
               this.endOfResources = true
             } else if (infinite) {
@@ -592,7 +595,7 @@ export default {
             this.loadingResources = false
           })
         } else { // general query if not logged in
-          this.$http.get('/resource', {
+          this.$http.get('/api/resource', {
             params: {
               languageCode: 'en',
               include: include,
@@ -603,6 +606,7 @@ export default {
               descending: this.descending
             }
           }).then(response => {
+            console.log(response)
             if (response.body.length === 0) {
               this.endOfResources = true
             } else if (infinite) {
@@ -630,7 +634,7 @@ export default {
         }
       }
       if (this.member.uid !== null) { // member specific query if logged in
-        this.$http.get('/api/resource/count', {
+        this.$http.get('/api/auth/resource/count', {
           params: {
             languageCode: 'en',
             include: include
@@ -640,7 +644,7 @@ export default {
           this.resourcesViewed = response.body.viewedResources
         })
       } else { // general query if not logged in
-        this.$http.get('/resource/count', {
+        this.$http.get('/api/resource/count', {
           params: {
             languageCode: 'en',
             include: include,

@@ -338,10 +338,10 @@ export default {
     }
   },
   mounted () {
-    if (this.$route.name === 'resourceSub') { // take in as param?
+    if (this.$route.name === 'resource') { // take in as param?
       this.resourceMeta = true
       $('#addResourceModal').css('position', 'sticky')
-    } else if (this.$route.name === 'setSub') {
+    } else if (this.$route.name === 'tag') {
       this.synSetMeta = true
     } // else connect to neither (standalone resource)
     this.open()

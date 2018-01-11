@@ -1,14 +1,14 @@
 module.exports = function(app, db){
 
   // member routes
-  app.get('/member/:muid', publicRead);       // read details of a single member page
-  app.get('/member/:muid/history', readHistory);       // read member viweded history
-  app.get('/member/:muid/set/top', readTopSets);       // read member sets in group
-  app.get('/member/:muid/set/:guid', readGroups);       // read member sets in group
-  app.get('/api/member/:muid', memberReadFull);   // read details of a single member page
-  app.put('/api/member/:muid', updateCore); // update a single members core node data
-  app.post('/api/member', createCore);    // create (or update, if present) a member core node.
-  app.delete('/api/member', deleteCore);  // delete member core node and relationships....and translations?
+  app.get('/api/member/:muid', publicRead);       // read details of a single member page
+  app.get('/api/member/:muid/history', readHistory);       // read member viweded history
+  app.get('/api/member/:muid/set/top', readTopSets);       // read member sets in group
+  app.get('/api/member/:muid/set/:guid', readGroups);       // read member sets in group
+  app.get('/api/auth/member/:muid', memberReadFull);   // read details of a single member page
+  app.put('/api/auth/member/:muid', updateCore); // update a single members core node data
+  app.post('/api/auth/member', createCore);    // create (or update, if present) a member core node.
+  app.delete('/api/auth/member', deleteCore);  // delete member core node and relationships....and translations?
 
   // app.get('/member/:rid/term/', readTerms);          // retrieve a members tagged terms
   // app.put('/member/:rid/term/', updateTerms);        // batch add terms to member (with ids) - adds provided tags, doesn't remove relationships

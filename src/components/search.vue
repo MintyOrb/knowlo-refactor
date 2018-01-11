@@ -84,7 +84,7 @@ export default {
   mounted () {
     var options = {
       inputId: this.inputId || 'search-input',
-      ajaxUrl: this.ajaxUrl || '/term/search/',
+      ajaxUrl: this.ajaxUrl || '/api/term/search/',
       data: {exclude: this.exclude},
       minLength: 1
     }

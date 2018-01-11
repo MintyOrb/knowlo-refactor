@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var admin = require('firebase-admin');
+var serveStatic = require('serve-static');
 var firebaseMiddleware = require('express-firebase-middleware');
 
 if (process.env.GRAPHENEDB_URL) {
@@ -29,9 +30,10 @@ admin.initializeApp({
   databaseURL: "https://knowlo-952cc.firebaseio.com/"
 });
 
-app.use('/api', firebaseMiddleware.auth);
+app.use('/api/auth', firebaseMiddleware.auth);
 app.use(bodyParser.json())
-app.use(express.static('./'))
+// app.use(express.static(__dirname)) // if local?
+// app.use(serveStatic(__dirname + "/dist")); // if heroku?
 
 require('./initDB')(app, db);
 require('./CRUD/terms')(app, db);

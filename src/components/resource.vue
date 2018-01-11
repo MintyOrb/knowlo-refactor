@@ -22,11 +22,11 @@ y === '<template>
       'margin20': display==='thumb' || display==='list' ,
       'inline mb': display==='list'}"
 			>
-			<router-link :to="{ name: 'resourceSub', params: { uid: re.resource.uid }}">
+			<router-link :to="{ name: 'resource', params: { uid: re.resource.uid }}">
 				<img :src="re.resource.mThumb" />
 			</router-link>
 		</div>
-		<router-link v-if="re.resource.text && re.resource.text.length > 0 && display =='thumb'" :to="{ name: 'resourceSub', params: { uid: re.resource.uid }}">
+		<router-link v-if="re.resource.text && re.resource.text.length > 0 && display =='thumb'" :to="{ name: 'resource', params: { uid: re.resource.uid }}">
 			<div class="margin20 hoverable thumb">
 				{{re.resource.text.substring(0,5)}}...
 			</div>
@@ -37,7 +37,7 @@ y === '<template>
       'truncate inline tmargin': display === 'list',
       'card-content': display === 'card'}"
 			>
-			<router-link :to="{ name: 'resourceSub', params: { uid: re.resource.uid }}">
+			<router-link :to="{ name: 'resource', params: { uid: re.resource.uid }}">
 				<span :class="{'title': display === 'card'}">{{re.resource.title}}</span>
 			</router-link>
 
@@ -46,7 +46,7 @@ y === '<template>
 			</div>
 		</div>
 		<div class="rText" v-if="re.resource.text && display !='thumb'">
-			<router-link :to="{ name: 'resourceSub', params: { uid: re.resource.uid }}">
+			<router-link :to="{ name: 'resource', params: { uid: re.resource.uid }}">
 				{{re.resource.text}}
 			</router-link>
 		</div>

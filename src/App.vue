@@ -168,7 +168,7 @@ export default {
       if (member) {
         this.member = member
         this.member.first = member.displayName.substr(0, member.displayName.indexOf(' ')) // get first name -  if there is no space at all, then the first line will return an empty string and the second line will return the entire string
-        member.getIdtag().then((accesstag) => {
+        member.getIdToken().then((accesstag) => {
           Vue.http.headers.common['Authorization'] = 'Bearer ' + accesstag
           this.touchMember()
           // bus.$emit('login', member)
@@ -187,6 +187,9 @@ export default {
 }
 </script>
 <style src="materialize-css/dist/css/materialize.css"></style>
+<style src="flickity/dist/flickity.min.css"></style>
+<style src="leaflet/dist/leaflet.css"></style>
+<style src="materialize-css/extras/noUiSlider/nouislider.css"></style>
 <style>
 <style>
 .modal .modal-content {
@@ -195,12 +198,12 @@ export default {
 .margin20 {
 	margin:20px;
 }
-.modal {
+/* .modal {
   top: 0!important;
   max-height: 100%!important;
   width: 100%!important;
   height: 100%!important;
-}
+} */
 .modal-overlay {
   height: 100vh;
   position: sticky;
@@ -357,9 +360,9 @@ html {
 .dropdown-content {
   z-index: 2000;
 }
-.modal {
+/* .modal {
   display: flex!important;
-}
+} */
 [v-cloak] { display: none }
 .headroom {
     will-change: transform;

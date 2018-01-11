@@ -77,23 +77,5 @@ module.exports = {
     // `npm run build --report`
     // Set to `true` or `false` to always turn it on or off
     bundleAnalyzerReport: process.env.npm_config_report,
-  },
-  // resolve: {
-  //   alias: {
-  //     'masonry': 'masonry-layout',
-  //     'isotope': 'isotope-layout',
-  //     // 'jquery': path.resolve(__dirname, 'node_modules/jquery/dist/jquery.js'),
-  //     $: path.resolve(__dirname, 'node_modules/jquery/dist/jquery.js'),
-  //     'jquery': path.resolve(__dirname, 'node_modules/jquery/dist/jquery.js')
-  //   }
-  // },
-  // plugins: [
-  //   new webpack.ProvidePlugin({
-  //     $: 'jquery',
-  //     jquery: 'jquery',
-  //     jQuery: 'jquery',
-  //     'window.$': 'jquery',
-  //     'window.jQuery': 'jquery'
-  //   })
-  // ]
+  }
 }

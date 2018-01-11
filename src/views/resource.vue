@@ -138,8 +138,8 @@
       <!-- tags -->
       <div class="resourceStep">
         <isotope ref='rTermBin' :list="terms" :options='{}'>
-          <term v-for="term in terms" :term="term" :key="term.setID" display="list" v-on:include="addToQuery(term); close();" v-on:remove="removeTerm(term.setID)" v-on:focus="addToQuery(term); close();" v-on:pin="addToQuery(term); close();">
-          </term>
+          <tag v-for="term in terms" :term="term" :key="term.setID" display="list" v-on:include="addToQuery(term); close();" v-on:remove="removeTerm(term.setID)" v-on:focus="addToQuery(term); close();" v-on:pin="addToQuery(term); close();">
+          </tag>
         </isotope>
         <search exclude="" input-id="resourceTest" v-on:select="addTerm"></search>
       </div>
@@ -161,8 +161,14 @@
 import Materialize from 'materialize-css'
 import $ from 'jquery'
 import Router from 'vue-router'
+import tag from '@/components/tag'
+import resource from '@/components/resource'
+import search from '@/components/search'
+import isotope from 'vueisotope'
+
 export default {
   props: ['member'],
+  components: { isotope, search, tag, resource },
   data: function () {
     return {
       resource: {
@@ -201,7 +207,7 @@ export default {
       })
     },
     fetchResource: function () {
-      this.$http.get('/resource/' + this.$route.params.uid + '/full', {
+      this.$http.get('/api/resource/' + this.$route.params.uid + '/full', {
         params: {
           languageCode: 'en'
         }
@@ -283,7 +289,7 @@ export default {
     },
     fetchDiscussion: function () {
       this.discussion = []
-      this.$http.get('/resource/' + this.$route.params.uid + '/discussion', {
+      this.$http.get('/api/resource/' + this.$route.params.uid + '/discussion', {
         params: {
           languageCode: 'en'
         }
@@ -303,7 +309,7 @@ export default {
     },
     fetchRelated: function () {
       this.$nextTick(() => {
-        this.$http.get('/resource/' + this.$route.params.uid + '/related', {
+        this.$http.get('/api/resource/' + this.$route.params.uid + '/related', {
           params: {
             languageCode: 'en'
           }

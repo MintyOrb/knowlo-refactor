@@ -2,50 +2,50 @@ module.exports = function(app, db){
 
 var shortid = require('shortid');
 
-app.get('/term/search/:text/:exclude?', search);
-app.get('/term/most', most);
+app.get('/api/term/search/:text/:exclude?', search);
+app.get('/api/term/most', most);
 
 // translation
-app.get('/set/:setID/translation/', readTranslation);          // retrieve a translation of a set based on term id and provided langauge code. If language not found, attempt a translation. Also returns term core
-app.put('/api/set/:setID/translation/:uid', updateTranslation);    // update single set translation by ID | is /set/:setID superfluous? /setMeta/:uid instead?
-app.post('/api/set/:setID/translation/', createTranslation);       // create set translation based on language code and connect to set. Return resrouce core and new translation
-app.delete('/api/set/:setID/translation/:uid', deleteTranslation); // delete set translation by id | delete node or just relatinship??
+app.get('/api/set/:setID/translation/', readTranslation);          // retrieve a translation of a set based on term id and provided langauge code. If language not found, attempt a translation. Also returns term core
+app.put('/api/auth/set/:setID/translation/:uid', updateTranslation);    // update single set translation by ID | is /set/:setID superfluous? /setMeta/:uid instead?
+app.post('/api/auth/set/:setID/translation/', createTranslation);       // create set translation based on language code and connect to set. Return resrouce core and new translation
+app.delete('/api/auth/set/:setID/translation/:uid', deleteTranslation); // delete set translation by id | delete node or just relatinship??
 // synonym
-app.get('/set/:setID/synonym/', readSynonym);                // retrieve synonyms of a set based on set id and provided langauge code. If language not found, attempt translation? Also returns set core
-app.put('/api/set/:setID/synonym/:otherID', updateSynonym);    // TODO: this is really a merge... add set synonym by ID | is /set/:setID - copy any other sets and resource relationships
-// app.put('/api/set/:setID/synonym/:otherID/add', addSynonym);    // add term by ID | is /set/:setID - don't copy any other sets and resource relationships
-// ? don't need? app.post('/api/set/:setID/synonym/', createSynonym);      // create set synonym based on language code and connect to set. Return resrouce core and new synonym
-app.delete('/api/set/:setID/synonym/:termID', deleteSynonym); // delete term synonym by id | delete node or just relatinship??
+app.get('/api/set/:setID/synonym/', readSynonym);                // retrieve synonyms of a set based on set id and provided langauge code. If language not found, attempt translation? Also returns set core
+app.put('/api/auth/set/:setID/synonym/:otherID', updateSynonym);    // TODO: this is really a merge... add set synonym by ID | is /set/:setID - copy any other sets and resource relationships
+// app.put('/api/auth/set/:setID/synonym/:otherID/add', addSynonym);    // add term by ID | is /set/:setID - don't copy any other sets and resource relationships
+// ? don't need? app.post('/api/auth/set/:setID/synonym/', createSynonym);      // create set synonym based on language code and connect to set. Return resrouce core and new synonym
+app.delete('/api/auth/set/:setID/synonym/:termID', deleteSynonym); // delete term synonym by id | delete node or just relatinship??
 // groups
-app.get('/set/:setID/group/', readGroup);                 // retrieve a terms groups of a term based on term id and provided langauge code. If language not found, attempt a group. Also returns term core
-app.put('/api/set/:setID/group/:groupID', updateGroup);    // update single term group by ID | is /term/:termID superfluous? /termMeta/:uid instead?
-// ? app.post('/api/term/:termID/group/', createGroup);     // create term group based on language code and connect to term. Return resrouce core and new group
-app.delete('/api/set/:setID/group/:groupID', deleteGroup); // delete term group by id | delete node or just relatinship??
+app.get('/api/set/:setID/group/', readGroup);                 // retrieve a terms groups of a term based on term id and provided langauge code. If language not found, attempt a group. Also returns term core
+app.put('/api/auth/set/:setID/group/:groupID', updateGroup);    // update single term group by ID | is /term/:termID superfluous? /termMeta/:uid instead?
+// ? app.post('/api/auth/term/:termID/group/', createGroup);     // create term group based on language code and connect to term. Return resrouce core and new group
+app.delete('/api/auth/set/:setID/group/:groupID', deleteGroup); // delete term group by id | delete node or just relatinship??
 // within
-app.get('/set/:setID/within/', within);
-app.put('/api/set/:setID/within/:otherID', updateWithin);
-app.delete('/api/set/:setID/within/:otherID', deleteWithin);
+app.get('/api/set/:setID/within/', within);
+app.put('/api/auth/set/:setID/within/:otherID', updateWithin);
+app.delete('/api/auth/set/:setID/within/:otherID', deleteWithin);
 // contains
-app.get('/set/:setID/contains/', contains);
-app.put('/api/set/:setID/contains/:otherID', updateContains);
-app.delete('/api/set/:setID/contains/:otherID', deleteContains);
+app.get('/api/set/:setID/contains/', contains);
+app.put('/api/auth/set/:setID/contains/:otherID', updateContains);
+app.delete('/api/auth/set/:setID/contains/:otherID', deleteContains);
 
-// app.get('/set/:ruid/meta/', getMeta); //
-app.put('/api/set/:sID/meta/:mID', tagMeta);
-app.get('/set/:setID/meta/', getMeta);
-app.get('/api/set/:setID/meta/', memberGetMeta);
+// app.get('/api/set/:ruid/meta/', getMeta); //
+app.put('/api/auth/set/:sID/meta/:mID', tagMeta);
+app.get('/api/set/:setID/meta/', getMeta);
+app.get('/api/auth/set/:setID/meta/', memberGetMeta);
 
 // core
-app.get('/set', query);           // query sets based on provided set IDs
-app.get('/set/:coreID/crossSection', crossSection);   // get crossSection sets
-app.get('/set/:uid', read);    // read details of a single set and translation
-app.get('/api/set', query);           // query sets based on user details and provided set IDs - /set/query instaed?
-app.put('/api/term/:uid', updateCore); // update a single resrouces core node data
-app.post('/api/set', create);         // create (or update, if present) a term core and single translation node.
-app.delete('/api/set/:setID', deleteCore);   // delete term core node and relationships....and translations?
-app.put('/api/set/:sID/:rID/newTopIcon', newTopIcon)
+app.get('/api/set', query);           // query sets based on provided set IDs
+app.get('/api/set/:coreID/crossSection', crossSection);   // get crossSection sets
+app.get('/api/set/:uid', read);    // read details of a single set and translation
+app.get('/api/auth/set', query);           // query sets based on user details and provided set IDs - /set/query instaed?
+app.put('/api/auth/term/:uid', updateCore); // update a single resrouces core node data
+app.post('/api/auth/set', create);         // create (or update, if present) a term core and single translation node.
+app.delete('/api/auth/set/:setID', deleteCore);   // delete term core node and relationships....and translations?
+app.put('/api/auth/set/:sID/:rID/newTopIcon', newTopIcon)
 
-app.put('/god/name/:uid/:name', name);
+app.put('/api/god/name/:uid/:name', name);
 function name(req, res){
   var cypher = "MATCH (n:translation {uid: {uid}}) set n.name={name}  return n "
    db.query(cypher, { name: req.params.name, uid: req.params.uid },function(err, result) {
@@ -53,7 +53,7 @@ function name(req, res){
      res.send(result)
    })
 }
-app.put('/god/order/:termID/:order/:setID', order);
+app.put('/api/god/order/:termID/:order/:setID', order);
 function order(req, res){
   var cypher = "MATCH (n {uid: {termID}})-[r]-(s:synSet {uid: {setID}}) set r.order={order}  return n "
    db.query(cypher, {

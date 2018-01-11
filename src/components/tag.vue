@@ -44,7 +44,7 @@
   									</div>
   								</div> -->
   								<div class="rotater">
-  									<router-link :to="{ name: 'setSub', params: { uid: term.setID, name: term.translation.name }}">
+  									<router-link :to="{ name: 'tag', params: { uid: term.setID, name: term.translation.name }}">
   										<div class="mbtn mbtn-icon flexCenter":class="{showInfo: status.infoIcon, infoNav: hovering && inSidebar, hide: hide.indexOf('info')>-1 }">
   											<i class="fa fa-info" style="padding-right:10px;"></i>
   										</div>
@@ -112,7 +112,7 @@
   						<li @click="pin"><a><i class="fa fa-thumb-tack"></i>Pin</a></li>
   						<!-- <li @click="lens"><a><i class="fa fa-crosshairs"></i>Cross Section</a></li> -->
   						<li @click="remove"><a><i class="fa fa-times"></i>Remove</a></li>
-  						<li @click=""><router-link :to="{ name: 'setSub', params: { uid: term.setID, name: term.translation.name }}"><i class="fa fa-info"></i>tag Page</router-link></li>
+  						<li @click=""><router-link :to="{ name: 'tag', params: { uid: term.setID, name: term.translation.name }}"><i class="fa fa-info"></i>tag Page</router-link></li>
   					</ul>
 
 

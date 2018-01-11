@@ -36,8 +36,6 @@ module.exports = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
-      // 'jquery': path.resolve(__dirname, 'node_modules/jquery/dist/jquery.js'),
-      // '$': path.resolve(__dirname, 'node_modules/jquery/dist/jquery.js'),
       'masonry': 'masonry-layout',
       'jquery': 'materialize-css/node_modules/jquery/dist/jquery.js',
       'isotope': 'isotope-layout'

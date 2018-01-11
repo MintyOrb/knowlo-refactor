@@ -76,7 +76,7 @@ export default {
     random () {
       this.$http.get('/resource/random').then(response => {
         Router.push({
-          name: 'resourceSub',
+          name: 'resource',
           params: {
             uid: response.body.uid
           }
