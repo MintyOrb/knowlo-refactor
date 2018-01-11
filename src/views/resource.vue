@@ -137,11 +137,11 @@
       </div>
       <!-- tags -->
       <div class="resourceStep">
-        <isotope ref='rTermBin' :list="terms" :options='{}'>
-          <tag v-for="term in terms" :term="term" :key="term.setID" display="list" v-on:include="addToQuery(term); close();" v-on:remove="removeTerm(term.setID)" v-on:focus="addToQuery(term); close();" v-on:pin="addToQuery(term); close();">
+        <isotope ref='rTagBin' :list="tags" :options='{}'>
+          <tag v-for="tag in tags" :tag="tag" :key="tag.setID" display="list" v-on:include="addToQuery(tag); close();" v-on:remove="removeTag(tag.setID)" v-on:focus="addToQuery(tag); close();" v-on:pin="addToQuery(tag); close();">
           </tag>
         </isotope>
-        <search exclude="" input-id="resourceTest" v-on:select="addTerm"></search>
+        <search exclude="" input-id="resourceTest" v-on:select="addTag"></search>
       </div>
       <!-- related -->
       <div class="resourceStep discussion">
@@ -174,7 +174,7 @@ export default {
       resource: {
         uid: undefined
       },
-      terms: [], // current resources terms
+      tags: [], // current resources tags
       discussion: [], // resources within discussion
       related: [], // resources related to current resource
       discussionDisplay: 'card', // default display for discussion
@@ -214,8 +214,8 @@ export default {
       }).then(response => {
         if (response.body.resource) {
           this.resource = response.body.resource
-          this.terms = response.body.terms
-          this.determineResourceDisplay()
+          this.tags = response.body.tags
+          this.detagineResourceDisplay()
         } else {
           Materialize.toast('Resource not found.', 4000)
         }
@@ -225,7 +225,7 @@ export default {
         Materialize.toast('Something went wrong...are you online?', 4000)
       })
     },
-    determineResourceDisplay: function () {
+    detagineResourceDisplay: function () {
       if (this.resource.url) {
         if (this.resource.url.match(/[^/]+(jpg|png|gif|jpeg)$/)) {
           this.resource.displayType = 'image'
@@ -323,11 +323,11 @@ export default {
         })
       })
     },
-    addTerm: function (set) {
+    addTag: function (set) {
       this.$http.put('/api/resource/' + this.resource.uid + '/set/' + set.setID).then(response => {
         if (response.body) {
-          Materialize.toast('term added', 4000)
-          this.terms.push(set)
+          Materialize.toast('tag added', 4000)
+          this.tags.push(set)
         } else {
           Materialize.toast('Something went wrong...', 4000)
         }
@@ -335,11 +335,11 @@ export default {
         Materialize.toast('Something went wrong...are you online?', 4000)
       })
     },
-    removeTerm: function (setUID) {
+    removeTag: function (setUID) {
       this.$http.delete('/api/resource/' + this.resource.uid + '/set/' + setUID).then(response => {
         if (response.body) {
-          Materialize.toast('term removed.', 4000)
-          this.terms.splice(this.terms.findIndex((set) => set.setID === setUID), 1)
+          Materialize.toast('tag removed.', 4000)
+          this.tags.splice(this.tags.findIndex((set) => set.setID === setUID), 1)
         } else {
           Materialize.toast('Something went wrong...', 4000)
         }

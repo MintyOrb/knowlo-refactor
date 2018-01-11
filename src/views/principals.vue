@@ -21,7 +21,7 @@
 					<div id="community" class="section scrollspy">
 		        <h5>Radically Community Driven</h5>
 						<p>All decisions regarding future development are in the hands of the community and will be taken in the form of community-defined <a target="_blank" href="https://en.wikipedia.org/wiki/Weighted_voting">weighted voting</a>.</p>
-						<p>Everything from what features should be developed (and how they're prioritized) to the logo, name, and even the mission is determined by the community. </p>
+						<p>Everything from what features should be developed (and how they're prioritized) to the logo, name, and even the mission is detagined by the community. </p>
 						<p>Though knowlo has been seeded with some direction, it's better thought of as an app version of the game <a href='https://en.wikipedia.org/wiki/1000_Blank_White_Cards' target="_blank">1000 Blank White Cards.</a> </p>
 		      </div>
 

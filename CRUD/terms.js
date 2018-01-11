@@ -2,25 +2,25 @@ module.exports = function(app, db){
 
 var shortid = require('shortid');
 
-app.get('/api/term/search/:text/:exclude?', search);
-app.get('/api/term/most', most);
+app.get('/api/tag/search/:text/:exclude?', search);
+app.get('/api/tag/most', most);
 
 // translation
-app.get('/api/set/:setID/translation/', readTranslation);          // retrieve a translation of a set based on term id and provided langauge code. If language not found, attempt a translation. Also returns term core
+app.get('/api/set/:setID/translation/', readTranslation);          // retrieve a translation of a set based on tag id and provided langauge code. If language not found, attempt a translation. Also returns tag core
 app.put('/api/auth/set/:setID/translation/:uid', updateTranslation);    // update single set translation by ID | is /set/:setID superfluous? /setMeta/:uid instead?
 app.post('/api/auth/set/:setID/translation/', createTranslation);       // create set translation based on language code and connect to set. Return resrouce core and new translation
 app.delete('/api/auth/set/:setID/translation/:uid', deleteTranslation); // delete set translation by id | delete node or just relatinship??
 // synonym
 app.get('/api/set/:setID/synonym/', readSynonym);                // retrieve synonyms of a set based on set id and provided langauge code. If language not found, attempt translation? Also returns set core
 app.put('/api/auth/set/:setID/synonym/:otherID', updateSynonym);    // TODO: this is really a merge... add set synonym by ID | is /set/:setID - copy any other sets and resource relationships
-// app.put('/api/auth/set/:setID/synonym/:otherID/add', addSynonym);    // add term by ID | is /set/:setID - don't copy any other sets and resource relationships
+// app.put('/api/auth/set/:setID/synonym/:otherID/add', addSynonym);    // add tag by ID | is /set/:setID - don't copy any other sets and resource relationships
 // ? don't need? app.post('/api/auth/set/:setID/synonym/', createSynonym);      // create set synonym based on language code and connect to set. Return resrouce core and new synonym
-app.delete('/api/auth/set/:setID/synonym/:termID', deleteSynonym); // delete term synonym by id | delete node or just relatinship??
+app.delete('/api/auth/set/:setID/synonym/:tagID', deleteSynonym); // delete tag synonym by id | delete node or just relatinship??
 // groups
-app.get('/api/set/:setID/group/', readGroup);                 // retrieve a terms groups of a term based on term id and provided langauge code. If language not found, attempt a group. Also returns term core
-app.put('/api/auth/set/:setID/group/:groupID', updateGroup);    // update single term group by ID | is /term/:termID superfluous? /termMeta/:uid instead?
-// ? app.post('/api/auth/term/:termID/group/', createGroup);     // create term group based on language code and connect to term. Return resrouce core and new group
-app.delete('/api/auth/set/:setID/group/:groupID', deleteGroup); // delete term group by id | delete node or just relatinship??
+app.get('/api/set/:setID/group/', readGroup);                 // retrieve a tags groups of a tag based on tag id and provided langauge code. If language not found, attempt a group. Also returns tag core
+app.put('/api/auth/set/:setID/group/:groupID', updateGroup);    // update single tag group by ID | is /tag/:tagID superfluous? /tagMeta/:uid instead?
+// ? app.post('/api/auth/tag/:tagID/group/', createGroup);     // create tag group based on language code and connect to tag. Return resrouce core and new group
+app.delete('/api/auth/set/:setID/group/:groupID', deleteGroup); // delete tag group by id | delete node or just relatinship??
 // within
 app.get('/api/set/:setID/within/', within);
 app.put('/api/auth/set/:setID/within/:otherID', updateWithin);
@@ -40,9 +40,9 @@ app.get('/api/set', query);           // query sets based on provided set IDs
 app.get('/api/set/:coreID/crossSection', crossSection);   // get crossSection sets
 app.get('/api/set/:uid', read);    // read details of a single set and translation
 app.get('/api/auth/set', query);           // query sets based on user details and provided set IDs - /set/query instaed?
-app.put('/api/auth/term/:uid', updateCore); // update a single resrouces core node data
-app.post('/api/auth/set', create);         // create (or update, if present) a term core and single translation node.
-app.delete('/api/auth/set/:setID', deleteCore);   // delete term core node and relationships....and translations?
+app.put('/api/auth/tag/:uid', updateCore); // update a single resrouces core node data
+app.post('/api/auth/set', create);         // create (or update, if present) a tag core and single translation node.
+app.delete('/api/auth/set/:setID', deleteCore);   // delete tag core node and relationships....and translations?
 app.put('/api/auth/set/:sID/:rID/newTopIcon', newTopIcon)
 
 app.put('/api/god/name/:uid/:name', name);
@@ -53,12 +53,12 @@ function name(req, res){
      res.send(result)
    })
 }
-app.put('/api/god/order/:termID/:order/:setID', order);
+app.put('/api/god/order/:tagID/:order/:setID', order);
 function order(req, res){
-  var cypher = "MATCH (n {uid: {termID}})-[r]-(s:synSet {uid: {setID}}) set r.order={order}  return n "
+  var cypher = "MATCH (n {uid: {tagID}})-[r]-(s:synSet {uid: {setID}}) set r.order={order}  return n "
    db.query(cypher, {
      order: parseInt(req.params.order.trim()),
-     termID: req.params.termID,
+     tagID: req.params.tagID,
      setID: req.params.setID
    },function(err, result) {
      if (err) console.log(err);
@@ -74,7 +74,7 @@ function order(req, res){
 */
 function query(req, res){
 
-  req.query.exclude = req.query.exclude.concat(req.query.include) // don't return query terms with group
+  req.query.exclude = req.query.exclude.concat(req.query.include) // don't return query tags with group
 
   var cypher="";
   var scale=""  // for uid of requested scale
@@ -83,11 +83,11 @@ function query(req, res){
    cypher = "MATCH (contentNode:resource)-[:TAGGED_WITH]->(searchSets:synSet) "
           + "WHERE searchSets.uid IN {searchSets} "
           + "WITH contentNode, COUNT(searchSets) as count "
-          + "WHERE count = {searchTermsCount} "
+          + "WHERE count = {searchTagsCount} "
           + "MATCH (set:synSet)<-[:TAGGED_WITH]-(contentNode), "
-            + "(set:synSet)-[setR:IN_SET]-(:term)-[:HAS_TRANSLATION {languageCode: {lang} }]->(translation:translation) "
-          + "WHERE setR.order=1 AND NOT set.uid IN {ignoreTerms} "
-          + "RETURN distinct count(DISTINCT contentNode) AS connections, translation, set as term, set.uid AS setID "
+            + "(set:synSet)-[setR:IN_SET]-(:tag)-[:HAS_TRANSLATION {languageCode: {lang} }]->(translation:translation) "
+          + "WHERE setR.order=1 AND NOT set.uid IN {ignoreTags} "
+          + "RETURN distinct count(DISTINCT contentNode) AS connections, translation, set as tag, set.uid AS setID "
           + "ORDER BY connections DESC "
           // + "ORDER BY {orderby} {updown}"
           // + "SKIP {skip} "
@@ -101,24 +101,24 @@ function query(req, res){
     scale=scaleIDs[req.query.type];
     cypher = "MATCH (n:synSet {uid:{scale}})<-[sizeR:IN_SET]-(size:synSet) "
           + "WITH size, sizeR "
-          + "MATCH (size)<-[setR:IN_SET]-(t:term)-[:HAS_TRANSLATION {languageCode: {lang} }]->(translation:translation) "
+          + "MATCH (size)<-[setR:IN_SET]-(t:tag)-[:HAS_TRANSLATION {languageCode: {lang} }]->(translation:translation) "
             + "WHERE setR.order=1 "
-          + "RETURN translation, size as term, size.uid AS setID, sizeR.order AS order "
+          + "RETURN translation, size as tag, size.uid AS setID, sizeR.order AS order "
           + "ORDER BY order "
   } else {
     // sets and the groups that contain them
      cypher = "MATCH (contentNode:resource)-[:TAGGED_WITH]->(b:synSet)-[:IN_SET*0..3]->(searchSets:synSet) "
             + "WHERE searchSets.uid IN {searchSets} "//AND b.uid IN {searchSets} "
             + "WITH contentNode, COUNT(searchSets) as scount "
-            + "WHERE scount = {searchTermsCount} " // necessary to match resources with all included sets
+            + "WHERE scount = {searchTagsCount} " // necessary to match resources with all included sets
             + "MATCH (set:synSet)<-[:TAGGED_WITH]-(contentNode) " // get all sets tagged to all resources tagged that are with sets in query
             + "WITH distinct set as s1, count(DISTINCT contentNode) AS connections "
             + "MATCH (s1)-[:IN_SET]->(s2:synSet), " // get sets 'containing' related sets
-              + "(s1)-[s1R:IN_SET]-(:term)-[:HAS_TRANSLATION {languageCode: {lang} }]->(s1translation:translation), " // get translation
-              + "(s2)-[s2R:IN_SET]-(:term)-[:HAS_TRANSLATION {languageCode: {lang} }]->(s2translation:translation) " // get translation
-            + "WHERE s1R.order=1 AND s2R.order=1 AND NOT s2.uid IN {ignoreTerms} " // only top synonym and don't include search terms
-            + "WITH s2, s2translation, collect({term: s1, translation: s1translation, setID:s1.uid, connections:connections}) as contains  "
-            + "RETURN COLLECT(distinct{term:s2, translation: s2translation, setID:s2.uid}) AS group, contains, size(contains) as numInGroup  "
+              + "(s1)-[s1R:IN_SET]-(:tag)-[:HAS_TRANSLATION {languageCode: {lang} }]->(s1translation:translation), " // get translation
+              + "(s2)-[s2R:IN_SET]-(:tag)-[:HAS_TRANSLATION {languageCode: {lang} }]->(s2translation:translation) " // get translation
+            + "WHERE s1R.order=1 AND s2R.order=1 AND NOT s2.uid IN {ignoreTags} " // only top synonym and don't include search tags
+            + "WITH s2, s2translation, collect({tag: s1, translation: s1translation, setID:s1.uid, connections:connections}) as contains  "
+            + "RETURN COLLECT(distinct{tag:s2, translation: s2translation, setID:s2.uid}) AS group, contains, size(contains) as numInGroup  "
             + "ORDER BY numInGroup DESC "
             + "LIMIT {limit}"
             // + "SKIP {skip} "
@@ -133,9 +133,9 @@ function query(req, res){
   }
   db.query(cypher, {
     searchSets: req.query.include,
-    ignoreTerms: req.query.exclude,
+    ignoreTags: req.query.exclude,
     scale: scale,
-    searchTermsCount: len,
+    searchTagsCount: len,
     lang: 'en',
     limit: parseInt(req.query.limit) || 10,
     skip: parseInt(req.query.skip) || 0
@@ -151,13 +151,13 @@ function crossSection(req, res){
   var cypher = "MATCH (coreSet:synSet {uid: {coreID} })<-[r:IN_SET]-(member:synSet) "
              + "WITH r, collect(distinct member) AS members "
              + "UNWIND members AS member "
-             + "OPTIONAL MATCH (memTrans:translation)<-[memLang:HAS_TRANSLATION]-(memTerm:term)-[memR:IN_SET]->(member)<-[IN_SET]-(inMembers:synSet)<-[inR:IN_SET]-(inTerm:term)-[inLang:HAS_TRANSLATION]->(inTrans:translation)  "
+             + "OPTIONAL MATCH (memTrans:translation)<-[memLang:HAS_TRANSLATION]-(memTag:tag)-[memR:IN_SET]->(member)<-[IN_SET]-(inMembers:synSet)<-[inR:IN_SET]-(inTag:tag)-[inLang:HAS_TRANSLATION]->(inTrans:translation)  "
              + "WHERE "
              + "memLang.languageCode IN [ {language} , 'en' ] AND memR.order=1  "
              + "AND inLang.languageCode IN [ {language} , 'en' ] AND inR.order=1  "
-             + "WITH r, member, memTrans, COLLECT({term: inMembers, translation: inTrans, setID: inMembers.uid}) AS contains "
+             + "WITH r, member, memTrans, COLLECT({tag: inMembers, translation: inTrans, setID: inMembers.uid}) AS contains "
              // TODO: where inMebmer->ids of filter tag (ex just concepts)
-             + "RETURN DISTINCT r, COLLECT({setID: member.uid, translation: memTrans, term: member}) AS group,  "
+             + "RETURN DISTINCT r, COLLECT({setID: member.uid, translation: memTrans, tag: member}) AS group,  "
              + "contains "
              + "ORDER BY  r.order"
   db.query(cypher, {coreID: req.params.coreID, language: req.query.languageCode },function(err, result) {
@@ -171,23 +171,23 @@ function crossSection(req, res){
 }
 
 /**
-* reads term core node and translation
+* reads tag core node and translation
 * language code passed via member as "member.languageCode" on body, default to english
 * @param {String} languageCode
-* @param {String} id will try to match on translation name of language provided and retrieve term id
+* @param {String} id will try to match on translation name of language provided and retrieve tag id
 * @param {Number} id
 * @return {Object} resource
 */
 function read(req, res){
   // if(req.params.uid==='undefined' && req.params.name){
-  //   var uid = req.params.name; // match term on name
-  //   var cypher = "MATCH (term:term)-[r:HAS_TRANSLATION]->(translation:translation) "
+  //   var uid = req.params.name; // match tag on name
+  //   var cypher = "MATCH (tag:tag)-[r:HAS_TRANSLATION]->(translation:translation) "
   //              + "WHERE LOWER(translation.name)=LOWER({uid}) "
-  //              + "AND r.languageCode={languageCode} return term, translation"
+  //              + "AND r.languageCode={languageCode} return tag, translation"
   // } else {
-    var uid = req.params.uid; // match term on id
-    var cypher ="MATCH (set:synSet {uid:{uid}})<-[s:IN_SET]-(term:term)-[r:HAS_TRANSLATION]->(translation:translation) "
-               +"WHERE r.languageCode={languageCode} return set as term, translation, set.UID as setID "
+    var uid = req.params.uid; // match tag on id
+    var cypher ="MATCH (set:synSet {uid:{uid}})<-[s:IN_SET]-(tag:tag)-[r:HAS_TRANSLATION]->(translation:translation) "
+               +"WHERE r.languageCode={languageCode} return set as tag, translation, set.UID as setID "
                +"ORDER BY s.order"
   // }
   db.query(cypher, {uid: uid, languageCode: req.query.languageCode || 'en'},function(err, result) {
@@ -195,28 +195,28 @@ function read(req, res){
     if(result){
       res.send(result[0])
     } else {
-      res.send() // TODO:term not found...or not found in desired language? get translation and add to db...
+      res.send() // TODO:tag not found...or not found in desired language? get translation and add to db...
     }
   })
 }
 
 function updateCore(req, res){
-  // pass in term ID ot be updated
-  // pass in updated term deets
+  // pass in tag ID ot be updated
+  // pass in updated tag deets
 
-  // copy term to revision node BEFORE updating
+  // copy tag to revision node BEFORE updating
   // track time of modification
 
   // NEED TO VALIDATE THIS
   // var cypher = "MATCH (member:member {uid: {memberID} }) "
-  //            + "MATCH (term:term {uid: {term}.uid }) "
-  //            + "OPTIONAL MATCH (term)-[r:HAS_REVISION]->(:edit) "
+  //            + "MATCH (tag:tag {uid: {tag}.uid }) "
+  //            + "OPTIONAL MATCH (tag)-[r:HAS_REVISION]->(:edit) "
   //            + "DELETE r "
-  //            + "CREATE (member)-[e:EDITED]->(revision:edit)<-[:HAS_REVISION]-(term) " // create or merge here?
-  //            + "SET revision = term, e.date=TIMESTAMP() "
-  //            + "MERGE (term {term}) "
-  //            + "RETURN term"
-  // db.query(cypher, {term: req.body.term, memberID: res.locals.user.uid },function(err, result) {
+  //            + "CREATE (member)-[e:EDITED]->(revision:edit)<-[:HAS_REVISION]-(tag) " // create or merge here?
+  //            + "SET revision = tag, e.date=TIMESTAMP() "
+  //            + "MERGE (tag {tag}) "
+  //            + "RETURN tag"
+  // db.query(cypher, {tag: req.body.tag, memberID: res.locals.user.uid },function(err, result) {
   //   if (err) console.log(err);
   //   console.log(result)
   //   if(result){
@@ -228,35 +228,35 @@ function updateCore(req, res){
 }
 
 /**
-* creates a new synSet and primary term with translation - (or updates existing - match based on provided string across all languages?)
+* creates a new synSet and primary tag with translation - (or updates existing - match based on provided string across all languages?)
 * language code passed via member as "member.languageCode" on body, default to english
 * @param {String} languageCode
-* @param {String} term
+* @param {String} tag
 * @return {Object}
 */
 function create(req, res){
-  var newTermID = shortid.generate()
+  var newTagID = shortid.generate()
   var newSetID = shortid.generate()
   var newTransID = shortid.generate()
 
-  req.body.term.lower = req.body.translation.name.toLowerCase()
+  req.body.tag.lower = req.body.translation.name.toLowerCase()
   var cypher = "MATCH (member:member {uid:{mid}}) "
               + "MERGE (set:synSet {lower: {set}.lower } ) "
-                + "ON CREATE SET set={term}, set.created=TIMESTAMP(), set.uid={setID} "
-                + "ON MATCH SET set={term}, set.updated=TIMESTAMP() "
-             + "MERGE (term:term {lower: {term}.lower } ) "
-               + "ON CREATE SET term={term}, term.created=TIMESTAMP(), term.uid={termID} "
-               + "ON MATCH SET term={term}, term.updated=TIMESTAMP() "
+                + "ON CREATE SET set={tag}, set.created=TIMESTAMP(), set.uid={setID} "
+                + "ON MATCH SET set={tag}, set.updated=TIMESTAMP() "
+             + "MERGE (tag:tag {lower: {tag}.lower } ) "
+               + "ON CREATE SET tag={tag}, tag.created=TIMESTAMP(), tag.uid={tagID} "
+               + "ON MATCH SET tag={tag}, tag.updated=TIMESTAMP() "
              + "CREATE (translation:translation {name: {translation}.name}) "
-             + "MERGE (term)-[in:IN_SET]->(set)<-[:ADDED {date:TIMESTAMP()} ]-(member)-[:ADDED {date:TIMESTAMP()} ]->(term)-[r:HAS_TRANSLATION {languageCode: {translation}.languageCode }]->(translation)<-[:ADDED {date:TIMESTAMP()} ]-(member) "
+             + "MERGE (tag)-[in:IN_SET]->(set)<-[:ADDED {date:TIMESTAMP()} ]-(member)-[:ADDED {date:TIMESTAMP()} ]->(tag)-[r:HAS_TRANSLATION {languageCode: {translation}.languageCode }]->(translation)<-[:ADDED {date:TIMESTAMP()} ]-(member) "
              + "ON CREATE SET in.order = 1 "
-             + "RETURN term, translation, set.uid as setID"
+             + "RETURN tag, translation, set.uid as setID"
 
   db.query(cypher, {
-      set: req.body.term,
+      set: req.body.tag,
       setID: newSetID,
-      term: req.body.term,
-      termID: newTermID,
+      tag: req.body.tag,
+      tagID: newTagID,
       translation: req.body.translation,
       transID: newTransID,
       mid: res.locals.user.uid
@@ -274,9 +274,9 @@ function deleteCore(req, res){
   //TODO: check permissions
   //TODO: for production, re-lable rather than delete?
   var cypher = "MATCH (set:synSet {uid: {uid}}) "
-              +"OPTIONAL MATCH (set)-[sr:IN_SET]-(terms:term)-[r:HAS_TRANSLATION]-(ttr:translation) "
+              +"OPTIONAL MATCH (set)-[sr:IN_SET]-(tags:tag)-[r:HAS_TRANSLATION]-(ttr:translation) "
               +"OPTIONAL MATCH (set)-[pr:HAS_PROPERTY]-(props:prop)-[ppr:HAS_TRANSLATION]-(ptr:translation) "
-              + "DETACH DELETE set,terms,props,ttr,ptr "
+              + "DETACH DELETE set,tags,props,ttr,ptr "
    db.query(cypher, {uid: req.params.setID },function(err, result) {
      if (err) console.log(err);
      res.send(result)
@@ -291,9 +291,9 @@ function deleteCore(req, res){
    ██    ██   ██ ██   ██ ██   ████ ███████ ███████ ██   ██    ██    ██  ██████  ██   ████
 */
 function readTranslation(req, res){
-  var cypher = "MATCH (n:synSet {uid: {uid}})-[sr:IN_SET]-(term:term)-[r:HAS_TRANSLATION]-(translation:translation) "
+  var cypher = "MATCH (n:synSet {uid: {uid}})-[sr:IN_SET]-(tag:tag)-[r:HAS_TRANSLATION]-(translation:translation) "
              + "WHERE sr.order=1 "
-             + "RETURN term, translation, n.uid as setID "
+             + "RETURN tag, translation, n.uid as setID "
    db.query(cypher, {uid: req.params.setID },function(err, result) {
      if (err) console.log(err);
      res.send(result)
@@ -317,10 +317,10 @@ function deleteTranslation(req, res){
 ███████    ██    ██   ████  ██████  ██   ████    ██    ██      ██
 */
 function readSynonym(req, res){
-  var cypher = "MATCH (set:synSet {uid: {set} })<-[r:IN_SET]-(syn:term)-[lang:HAS_TRANSLATION]->(translation:translation) "
+  var cypher = "MATCH (set:synSet {uid: {set} })<-[r:IN_SET]-(syn:tag)-[lang:HAS_TRANSLATION]->(translation:translation) "
              + "WHERE "
                  + "lang.languageCode IN [ {language} , 'en' ] "
-                  + "RETURN DISTINCT set.uid as setID, syn as term, translation , r.order as order "
+                  + "RETURN DISTINCT set.uid as setID, syn as tag, translation , r.order as order "
                   + "ORDER BY order"
 
   db.query(cypher, {set: req.params.setID, language: req.query.languageCode },function(err, result) {
@@ -338,7 +338,7 @@ function updateSynonym(req, res){//TODO this is really a merge..need to have jus
   var cypher = "MATCH (main:synSet {uid: {setID}}), (sub:synSet {uid: {otherID}}) "
              + "SET sub:merged REMOVE sub:synSet "
              + "WITH  main, sub "
-             + "MATCH (sub)<-[r:IN_SET]-(t:term) " // copy in terms
+             + "MATCH (sub)<-[r:IN_SET]-(t:tag) " // copy in tags
              + "WITH main, sub, t, COLLECT(r) as rels "
              + "FOREACH (rel in rels | "
                    + "MERGE (main)<-[new:IN_SET]-(t) "
@@ -379,11 +379,11 @@ function deleteSynonym(req, res){
 
   // delete vs remove...
   // for remove- will need to create (or re-create) synset node?
-  var cypher = "MATCH (syn:term {uid:{term}})-[r:IN_SET]->(set:synSet {uid:{set}}) "
+  var cypher = "MATCH (syn:tag {uid:{tag}})-[r:IN_SET]->(set:synSet {uid:{set}}) "
              + "DELETE r "
              + "RETURN set, syn "
 
-  db.query(cypher, {term: req.params.termID, set: req.params.setID, member: res.locals.user.uid },function(err, result) {
+  db.query(cypher, {tag: req.params.tagID, set: req.params.setID, member: res.locals.user.uid },function(err, result) {
     if (err) console.log(err);
     if(result){
       res.send(result[0])
@@ -402,10 +402,10 @@ function deleteSynonym(req, res){
 */
 
 function readGroup(req, res){
-  var cypher = "MATCH (trans:translation)<-[tr:HAS_TRANSLATION]-(term:term)-[r:IN_SET]->(groups:group)<-[:IN_GROUP]-(set:synSet {uid: {set} }) "
+  var cypher = "MATCH (trans:translation)<-[tr:HAS_TRANSLATION]-(tag:tag)-[r:IN_SET]->(groups:group)<-[:IN_GROUP]-(set:synSet {uid: {set} }) "
           + "WHERE "
               + "r.order=1 and tr.languageCode IN [ {language} , 'en' ] "
-               + "RETURN DISTINCT groups.uid as setID, trans as translation, term"
+               + "RETURN DISTINCT groups.uid as setID, trans as translation, tag"
               //  + "RETURN groups, translation,set.uid as setID"
   db.query(cypher, {set: req.params.setID, language: req.query.languageCode },function(err, result) {
     if (err) console.log(err);
@@ -461,9 +461,9 @@ function deleteGroup(req, res){
 */
 
 function within(req, res){
-  var cypher = "MATCH (set:synSet {uid: {set} })-[IN_SET]->(syn:synSet)<-[r:IN_SET]-(t:term)-[lang:HAS_TRANSLATION]->(translation:translation) "
+  var cypher = "MATCH (set:synSet {uid: {set} })-[IN_SET]->(syn:synSet)<-[r:IN_SET]-(t:tag)-[lang:HAS_TRANSLATION]->(translation:translation) "
              + "WHERE lang.languageCode IN [ {language} , 'en' ] AND r.order=1  "
-             + "RETURN DISTINCT syn.uid as setID, syn as term, translation , r "
+             + "RETURN DISTINCT syn.uid as setID, syn as tag, translation , r "
              + "ORDER BY  r.order"
 
   db.query(cypher, {set: req.params.setID, language: req.query.languageCode },function(err, result) {
@@ -518,9 +518,9 @@ function deleteWithin(req, res){
 
 function contains(req, res){
   var cypher = "MATCH (set:synSet {uid: {set} })<-[sr:IN_SET]-(syn:synSet), "
-                 + "(syn)<-[tr:IN_SET]-(t:term)-[lang:HAS_TRANSLATION]->(translation:translation) "
+                 + "(syn)<-[tr:IN_SET]-(t:tag)-[lang:HAS_TRANSLATION]->(translation:translation) "
                  + "WHERE tr.order=1 AND lang.languageCode IN [ {language} , 'en' ] "
-                 + "RETURN DISTINCT syn as term, syn.uid as setID, translation , tr, sr.order as order "
+                 + "RETURN DISTINCT syn as tag, syn.uid as setID, translation , tr, sr.order as order "
                  + "ORDER BY order"
 
   db.query(cypher, {set: req.params.setID, language: req.query.languageCode },function(err, result) {
@@ -537,7 +537,7 @@ function updateContains(req, res){
   var cypher = "MATCH (base:synSet {uid:{baseID}}) , (other:synSet {uid:{otherID}}) "
              + "MERGE (base)<-[r:IN_SET]-(other) "
              + "SET r.connectedBy = {member}, r.dateConnected = TIMESTAMP() "
-             + "RETURN base as term, base.uid as setID, other"
+             + "RETURN base as tag, base.uid as setID, other"
 
   db.query(cypher, {baseID: req.params.setID, otherID: req.params.otherID, member: res.locals.user.uid },function(err, result) {
     if (err) console.log(err);
@@ -567,10 +567,10 @@ function deleteContains(req, res){
 // get tags contained by another, organized by the returned tags groups
 function containsByGroup(req, res){
   // var cypher = "MATCH (set:synSet {uid: {set} })<-[sr:IN_SET]-(syn:synSet), "
-  //                + "(syn)<-[tr:IN_SET]-(t:term)-[lang:HAS_TRANSLATION]->(translation:translation) "
+  //                + "(syn)<-[tr:IN_SET]-(t:tag)-[lang:HAS_TRANSLATION]->(translation:translation) "
   //                + "OPTIONAL MATCH (syn:synSet)-[:IN_SET]->(group:synSet)"
   //                + "WHERE tr.order=1 AND lang.languageCode IN [ {language} , 'en' ] "
-  //                + "RETURN DISTINCT syn as term, syn.uid as setID, translation , tr, sr.order as order "
+  //                + "RETURN DISTINCT syn as tag, syn.uid as setID, translation , tr, sr.order as order "
   //                + "ORDER BY order"
 
   db.query(cypher, {set: req.params.setID, language: req.query.languageCode },function(err, result) {
@@ -600,13 +600,13 @@ function search(req,res){
   };
 
   var query = [
-      "MATCH (set:synSet)<-[:IN_SET]-(core:term)-[r:HAS_TRANSLATION {languageCode:{code}}]->(langNode) ",
+      "MATCH (set:synSet)<-[:IN_SET]-(core:tag)-[r:HAS_TRANSLATION {languageCode:{code}}]->(langNode) ",
       "WHERE langNode.name =~ {match} AND NOT set.uid IN [{exclude}] ",
-      // "with langNode, collect(set) as term "
-      "RETURN DISTINCT set.uid AS setID, core.url AS url, set AS term, langNode AS translation LIMIT 8" // order by....?
+      // "with langNode, collect(set) as tag "
+      "RETURN DISTINCT set.uid AS setID, core.url AS url, set AS tag, langNode AS translation LIMIT 8" // order by....?
   ].join('\n');
   //TODO:order by...
-  //TODO: only return top set if query matches mutiple terms in set
+  //TODO: only return top set if query matches mutiple tags in set
   db.query(query, properties, function (err, matches) {
       if (err) {console.log(err);}
       res.send(matches);
@@ -616,11 +616,11 @@ function search(req,res){
 
 
 
-// get most commonly tagged terms
-// TODO: skip/limit - language - disregard/include synonyms? - Terms most tagged to other terms?
+// get most commonly tagged tags
+// TODO: skip/limit - language - disregard/include synonyms? - Tags most tagged to other tags?
 function most(req,res){
-  var cypher = "MATCH (term:term)<-[:TAGGED_WITH]-(resource:resource) "
-             + "RETURN term.english, COUNT(resource) AS score "
+  var cypher = "MATCH (tag:tag)<-[:TAGGED_WITH]-(resource:resource) "
+             + "RETURN tag.english, COUNT(resource) AS score "
              + "ORDER BY score DESC limit 10"
   db.query(cypher, {languageCode: req.query.languageCode || 'en'},function(err, result) {
     if (err) console.log(err);

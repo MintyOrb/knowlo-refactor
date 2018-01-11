@@ -7,18 +7,18 @@
 
   		<div v-if="display==='thumb' ">
   			<span @mouseleave="leave()">
-  				<div class="termWidth">
+  				<div class="tagWidth">
   					<div class="menu" @mouseenter="delayHover()"  v-bind:class="{'active': hovering}">
   						<div class="">
 
   							<div @click="main" class="mbtn trigger" v-bind:class="{'scaleIcon': hovering}">
-  								<span v-if="!term.term.iconURL" class="flexCenter border">{{term.translation.name[0]}}</span>
+  								<span v-if="!tag.tag.iconURL" class="flexCenter border">{{tag.translation.name[0]}}</span>
   								<div v-else class="thumb card-image border">
-  									<img :src="term.term.iconURL">
+  									<img :src="tag.tag.iconURL">
   								</div>
   							</div>
 
-  							<!-- need a better way to determine when in sidebar... -->
+  							<!-- need a better way to detagine when in sidebar... -->
   							<div id="hoverPad" v-if="inSidebar">
   							</div>
 
@@ -29,7 +29,7 @@
   									</div>
   								</div>
   								<!-- <div  v-if="true" class="rotater">
-  									<div class="mbtn mbtn-icon flexCenter" :class="{'nope':!term.group, expandNav: hovering&& inSidebar}">
+  									<div class="mbtn mbtn-icon flexCenter" :class="{'nope':!tag.group, expandNav: hovering&& inSidebar}">
   										<i class="fa fa-expand"></i>
   									</div>
   								</div> -->
@@ -44,7 +44,7 @@
   									</div>
   								</div> -->
   								<div class="rotater">
-  									<router-link :to="{ name: 'tag', params: { uid: term.setID, name: term.translation.name }}">
+  									<router-link :to="{ name: 'tag', params: { uid: tag.setID, name: tag.translation.name }}">
   										<div class="mbtn mbtn-icon flexCenter":class="{showInfo: status.infoIcon, infoNav: hovering && inSidebar, hide: hide.indexOf('info')>-1 }">
   											<i class="fa fa-info" style="padding-right:10px;"></i>
   										</div>
@@ -74,12 +74,12 @@
   							</div>
   						</div>
   					</div>
-  					<div class="connections badge"v-if="term.connections">
-  						{{term.connections}}
+  					<div class="connections badge"v-if="tag.connections">
+  						{{tag.connections}}
   					</div>
   					<div class="nameholder">
   						<div class="name">
-  							{{term.translation.name}}
+  							{{tag.translation.name}}
   						</div>
   					</div>
   				</div>
@@ -96,23 +96,23 @@
   							<i class="fa fa-caret-down"></i>
   						</span> -->
 
-  						<span v-if="!term.term.iconURL" class="flexCenter border tagHW">{{term.translation.name[0]}}</span>
+  						<span v-if="!tag.tag.iconURL" class="flexCenter border tagHW">{{tag.translation.name[0]}}</span>
   						<span v-else class=" listimg">
-  							<img class='circle tagHW' :src="term.term.iconURL">
+  							<img class='circle tagHW' :src="tag.tag.iconURL">
   						</span>
-  						<span style='margin-left:10px;'>{{term.translation.name}}</span>
+  						<span style='margin-left:10px;'>{{tag.translation.name}}</span>
   					</span>
   					<span>
-  						<i @click.stop.prevent="" class="material-icons  more" :class="'dd'+term.setID" :data-activates='term.setID' >more_horiz</i>
-  						<!-- <i @click.prevent="" class="material-icons  more" :class="'dd'+term.setID" :data-activates='term.setID' >keyboard_arrow_down</i> -->
+  						<i @click.stop.prevent="" class="material-icons  more" :class="'dd'+tag.setID" :data-activates='tag.setID' >more_horiz</i>
+  						<!-- <i @click.prevent="" class="material-icons  more" :class="'dd'+tag.setID" :data-activates='tag.setID' >keyboard_arrow_down</i> -->
   					</span>
-  					<ul :id='term.setID' class='dropdown-content  tag-dropdown'>
+  					<ul :id='tag.setID' class='dropdown-content  tag-dropdown'>
   						<li @click="focus"><a><i class="fa fa-crosshairs"></i>Focus</a></li>
   						<li @click="include"><a><i class="fa fa-plus"></i>Add</a></li>
   						<li @click="pin"><a><i class="fa fa-thumb-tack"></i>Pin</a></li>
   						<!-- <li @click="lens"><a><i class="fa fa-crosshairs"></i>Cross Section</a></li> -->
   						<li @click="remove"><a><i class="fa fa-times"></i>Remove</a></li>
-  						<li @click=""><router-link :to="{ name: 'tag', params: { uid: term.setID, name: term.translation.name }}"><i class="fa fa-info"></i>tag Page</router-link></li>
+  						<li @click=""><router-link :to="{ name: 'tag', params: { uid: tag.setID, name: tag.translation.name }}"><i class="fa fa-info"></i>tag Page</router-link></li>
   					</ul>
 
 
@@ -125,12 +125,12 @@
   		</div>
 
   		<div class='hoverable' v-if="display==='godMode'">
-  			<span>{{term.term.uid}}</span>
-  			<!-- <span>{{term.setID}}</span> -->
-  			<input type="text" v-model='term.translation.name' v-on:blur="name(term.translation.uid,term.translation.name)" />
-  			<!-- <span> ({{term.translation.languageCode}})</span> -->
+  			<span>{{tag.tag.uid}}</span>
+  			<!-- <span>{{tag.setID}}</span> -->
+  			<input type="text" v-model='tag.translation.name' v-on:blur="name(tag.translation.uid,tag.translation.name)" />
+  			<!-- <span> ({{tag.translation.languageCode}})</span> -->
 
-  			<input type='text' v-model='term.order' v-on:blur="order(term.term.uid,term.order)" />
+  			<input type='text' v-model='tag.order' v-on:blur="order(tag.tag.uid,tag.order)" />
   			<i  @click="exclude" class="fa fa-minus"></i>
   		</div>
 
@@ -143,7 +143,7 @@ import $ from 'jquery'
 export default {
   name: 'tag',
   props: {
-    term: Object,
+    tag: Object,
     display: String,
     hide: {
       type: String,
@@ -181,9 +181,9 @@ export default {
         Materialize.toast('Something went wrong...are you online?', 4000)
       })
     },
-    order (termID, order) {
-      console.log(termID, order)
-      this.$http.put('/god/order/' + termID + '/' + order + '/' + this.$route.params.uid).then(response => {
+    order (tagID, order) {
+      console.log(tagID, order)
+      this.$http.put('/god/order/' + tagID + '/' + order + '/' + this.$route.params.uid).then(response => {
         if (response.body) {
           Materialize.toast('changed order', 4000)
         } else {
@@ -193,59 +193,59 @@ export default {
         Materialize.toast('Something went wrong...are you online?', 4000)
       })
     },
-    termAction (action) {
+    tagAction (action) {
 
     },
     main () {
       if (this.persistAction) {
         this.status.includeIcon = !this.status.includeIcon
       }
-      this.term.status = this.status
-      this.$emit('main', this.term)
+      this.tag.status = this.status
+      this.$emit('main', this.tag)
     },
     remove () {
       if (this.persistAction) {
         this.status.removeIcon = !this.status.removeIcon
       }
-      this.term.status = this.status
-      this.$emit('remove', this.term)
+      this.tag.status = this.status
+      this.$emit('remove', this.tag)
     },
     include () {
       // if (this.persistAction) {
       this.status.includeIcon = !this.status.includeIcon
       // }
-      this.term.status = this.status
-      this.$emit('include', this.term)
+      this.tag.status = this.status
+      this.$emit('include', this.tag)
     },
     exclude () {
       if (this.persistAction) {
         this.status.excludeIcon = !this.status.excludeIcon
       }
-      this.term.status = this.status
-      this.$emit('exclude', this.term)
+      this.tag.status = this.status
+      this.$emit('exclude', this.tag)
     },
     focus () {
       // if (this.persistAction) {
       this.status.focusIcon = !this.status.focusIcon
       // }
-      this.term.status = this.status
+      this.tag.status = this.status
       this.status.includeIcon = true
-      this.$emit('focus', this.term)
+      this.$emit('focus', this.tag)
     },
     pin () {
       // if (this.persistAction) {
       this.status.pinnedIcon = !this.status.pinnedIcon
       // }
       this.status.includeIcon = true
-      this.term.status = this.status
-      this.$emit('pin', this.term)
+      this.tag.status = this.status
+      this.$emit('pin', this.tag)
     },
     lens () {
       if (this.persistAction) {
         this.status.lensIcon = !this.status.lensIcon
       }
-      this.term.status = this.status
-      this.$emit('lens', this.term)
+      this.tag.status = this.status
+      this.$emit('lens', this.tag)
     },
     delayHover () {
       this.left = false
@@ -262,15 +262,15 @@ export default {
   },
   mounted () {
     this.$emit('created')
-    if (this.term.status) {
-      this.status = this.term.status
+    if (this.tag.status) {
+      this.status = this.tag.status
     }
-    if (this.$parent.$el && this.$parent.$el._prevClass === 'termQuery') { // stupid way to change css. cake component param/option instead
+    if (this.$parent.$el && this.$parent.$el._prevClass === 'tagQuery') { // stupid way to change css. cake component param/option instead
       this.inSidebar = true // defaults to false
     }
 
     // setup info dropdown
-    $('.dd' + this.term.setID).dropdown({
+    $('.dd' + this.tag.setID).dropdown({
       alignment: 'right',
       hover: true
     })
@@ -279,7 +279,7 @@ export default {
 </script>
 
 <style>
-/* term radial button based on this pen: http://codepen.io/suez/pen/vAais/*/
+/* tag radial button based on this pen: http://codepen.io/suez/pen/vAais/*/
 .menu, .menu .btn .fa, .menu .btn.trigger {
   position: relative;
 }
@@ -427,7 +427,7 @@ export default {
 	display: flex;
 	align-items: center;
 }
-.termWidth {
+.tagWidth {
   width: 100px;
   margin-bottom: 10px;
 }
@@ -563,15 +563,15 @@ export default {
 .definition{
   width:50vw;
 }
-.termMeta {
+.tagMeta {
   height: 100vh;
   width: 100vw;
 }
-.termTitle {
+.tagTitle {
   background-color: #2196F3;
   padding: 25px;
 }
-.termTitle span {
+.tagTitle span {
   font-weight: 200;
   color:white;
   font-size: 20px;

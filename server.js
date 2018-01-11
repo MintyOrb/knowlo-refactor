@@ -36,7 +36,7 @@ app.use(bodyParser.json())
 // app.use(serveStatic(__dirname + "/dist")); // if heroku?
 
 require('./initDB')(app, db);
-require('./CRUD/terms')(app, db);
+require('./CRUD/tags')(app, db);
 require('./CRUD/resources')(app, db);
 require('./CRUD/members')(app, db);
 

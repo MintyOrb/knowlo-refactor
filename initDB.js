@@ -8,15 +8,15 @@ module.exports = function(app, db){
   db.constraints.uniqueness.createIfNone('member', 'uid', function(err, constraint) {
     console.log(constraint);
   });
-  db.constraints.uniqueness.createIfNone('term', 'english', function(err, constraint) {
+  db.constraints.uniqueness.createIfNone('tag', 'english', function(err, constraint) {
     if(err){console.log(err)};
     console.log(constraint);
   });
-  db.constraints.uniqueness.createIfNone('term', 'uid', function(err, constraint) {
+  db.constraints.uniqueness.createIfNone('tag', 'uid', function(err, constraint) {
     if(err){console.log(err)};
     console.log(constraint);
   });
-  db.constraints.uniqueness.createIfNone('termSet', 'uid', function(err, constraint) {
+  db.constraints.uniqueness.createIfNone('tagSet', 'uid', function(err, constraint) {
     if(err){console.log(err)};
     console.log(constraint);
   });

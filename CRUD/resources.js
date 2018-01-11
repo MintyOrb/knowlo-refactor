@@ -3,17 +3,17 @@ module.exports = function(app, db){
   var async = require('async');
 
   // resource routes
-  app.get('/api/resource', query);                         // generic public query resources based on provided term IDs
-  app.get('/api/auth/resource', memberQuery);               // query resources based on user details and provided term IDs
-  app.get('/api/resource/count', count);                   // query number of resources related to terms
-  app.get('/api/auth/resource/count', memberCount);         // query number of resources related to terms; return number seen by member;  based on user details and provided term IDs
+  app.get('/api/resource', query);                         // generic public query resources based on provided tag IDs
+  app.get('/api/auth/resource', memberQuery);               // query resources based on user details and provided tag IDs
+  app.get('/api/resource/count', count);                   // query number of resources related to tags
+  app.get('/api/auth/resource/count', memberCount);         // query number of resources related to tags; return number seen by member;  based on user details and provided tag IDs
 
   app.get('/api/resource/random', random);                 // send back id for random resource, tagged with provided tags
   // app.get('/api/auth/resource/random', memberRandom);             // send back id for random resource, tagged with provided tags. Option for only unseen.
 
-  app.get('/api/resource/:uid/full', readFull);            // read full details of a single resource (tagged terms and translation by language code)
-  app.put('/api/auth/resource/:uid/full', updateFull);      // update full details of a single resource (tagged terms and translation by language code)
-  app.post('/api/auth/resource/:uid/full', createFull);     // create full details of a single resource (tagged terms and translation by language code)
+  app.get('/api/resource/:uid/full', readFull);            // read full details of a single resource (tagged tags and translation by language code)
+  app.put('/api/auth/resource/:uid/full', updateFull);      // update full details of a single resource (tagged tags and translation by language code)
+  app.post('/api/auth/resource/:uid/full', createFull);     // create full details of a single resource (tagged tags and translation by language code)
 
   app.get('/api/resource/:uid', readCore);                 // read details of a single resource core
   app.put('/api/auth/resource/:uid', updateCore);           // update a single resource core node data
@@ -29,13 +29,13 @@ module.exports = function(app, db){
   app.put('/api/auth/resource/:rUID/set/', updateSets);         // batch add sets to resource (with ids) - adds provided tags, doesn't remove relationships
   app.post('/api/auth/resource/:rUID/set/', batchSetSets);      // batch set sets to resource (with ids) - delete all tags relationships and create for  tags provided
   app.put('/api/auth/resource/:rUID/set/:sUID', addSet);         // add a single set to a resources by id
-  app.delete('/api/auth/resource/:rUID/set/:sUID', deleteSet);   // remove a single set relationship from a resources | DELETE /term/:uid to delete term node itself
+  app.delete('/api/auth/resource/:rUID/set/:sUID', deleteSet);   // remove a single set relationship from a resources | DELETE /tag/:uid to delete tag node itself
 
-  app.get('/api/resource/:ruid/discussion/', getDiscussion); // rename to meta???? add term/:tuid/meta
+  app.get('/api/resource/:ruid/discussion/', getDiscussion); // rename to meta???? add tag/:tuid/meta
   app.put('/api/auth/resource/:rUID/discussion/:dUID', tagDiscussion);
 
   app.put('/api/auth/resource/:rID/vote', castVote);
-  app.put('/api/auth/resource/:rUID/termSuggest', suggestedTerms);
+  app.put('/api/auth/resource/:rUID/tagSuggest', suggestedTags);
 
   app.get('/api/resource/:rUID/related/', getRelated);
 
@@ -44,9 +44,9 @@ module.exports = function(app, db){
 
   function query(req, res){
     /**
-    * searches for resources based on provide term IDs
+    * searches for resources based on provide tag IDs
     * language code passed in as "languageCode" by query, default to english
-    * @param {Array} query // terms with status (include/exclude)
+    * @param {Array} query // tags with status (include/exclude)
     * @param {Array} excludedSets //uid
     * @param {String} languageCode
     * @return {Object} resource
@@ -58,7 +58,7 @@ module.exports = function(app, db){
     var cypher = "MATCH (re:resource)-[:TAGGED_WITH]->(b:synSet)-[:IN_SET*0..3]->(synSet:synSet) "
            + "WITH distinct re, collect(synSet.uid) AS parentTags "
            + "WHERE all(tag IN {includedSets} WHERE tag IN parentTags) "              //  + "NOT synSet.uid IN {excludedSets} " // this doesn't work...
-           + "MATCH (re)-[:TAGGED_WITH]->(synSet:synSet)<-[synR:IN_SET]-(syn:term)-[tlang:HAS_TRANSLATION]->(tlangNode:translation) "
+           + "MATCH (re)-[:TAGGED_WITH]->(synSet:synSet)<-[synR:IN_SET]-(syn:tag)-[tlang:HAS_TRANSLATION]->(tlangNode:translation) "
            + "WHERE "
                + "synR.order=1 "
                + "AND tlang.languageCode IN [ {language} , 'en' ] "
@@ -68,13 +68,13 @@ module.exports = function(app, db){
            + "OPTIONAL MATCH (re)-[p:HAS_PROPERTY]->(prop:prop)-[plang:HAS_TRANSLATION ]->(ptrans:translation) "
            + "WHERE p.order=1 AND plang.languageCode IN [ {language} , 'en' ] "
            + "RETURN "
-             + "collect(DISTINCT {term: synSet.uid, url: synSet.url, translation: {name: tlangNode.name, languageCode: tlang.languageCode } } ) AS terms, "
+             + "collect(DISTINCT {tag: synSet.uid, url: synSet.url, translation: {name: tlangNode.name, languageCode: tlang.languageCode } } ) AS tags, "
              + "collect(DISTINCT {type: prop.type, value: ptrans.value}) AS properties, "
-             + "collect(DISTINCT synSet.uid) AS termIDs, " // for filtering into suggestion group...no longer used?
+             + "collect(DISTINCT synSet.uid) AS tagIDs, " // for filtering into suggestion group...no longer used?
              + "{quality: gq , complexity: gc } AS globalVote, "
              + "votes, "
              + "re AS resource ";
-             // determine orderby
+             // detagine orderby
              if(req.query.orderby === 'quality'){
                cypher += "ORDER BY COALESCE(globalVote.quality, -1) ";//IS NOT NULL, globalVote.quality DESC  "
              } else if (req.query.orderby === 'complexity') {
@@ -124,9 +124,9 @@ module.exports = function(app, db){
 
   function memberQuery(req, res){
     /**
-    * searches for resources based on provide term IDs
+    * searches for resources based on provide tag IDs
     * language code passed in as "languageCode" by query, default to english
-    * @param {Array} query // terms with status (include/exclude)
+    * @param {Array} query // tags with status (include/exclude)
     * @param {Array} excludedSets //uid
     * @param {String} languageCode
     * @return {Object} resource
@@ -141,7 +141,7 @@ module.exports = function(app, db){
            if(req.query.showViewed === 'false'){
              cypher += "AND NOT ((:member {uid:{mID}})-[:VIEWED]->(re)) "
            }
-           cypher += "MATCH (re)-[:TAGGED_WITH]->(synSet:synSet)<-[synR:IN_SET]-(syn:term)-[tlang:HAS_TRANSLATION]->(tlangNode:translation) "
+           cypher += "MATCH (re)-[:TAGGED_WITH]->(synSet:synSet)<-[synR:IN_SET]-(syn:tag)-[tlang:HAS_TRANSLATION]->(tlangNode:translation) "
            + "WHERE "
                + "synR.order=1 "
                + "AND tlang.languageCode IN [ {language} , 'en' ] "
@@ -154,15 +154,15 @@ module.exports = function(app, db){
            + "OPTIONAL MATCH (re)-[p:HAS_PROPERTY]->(prop:prop)-[plang:HAS_TRANSLATION ]->(ptrans:translation) "
            + "WHERE p.order=1 AND plang.languageCode IN [ {language} , 'en' ] "
            + "RETURN "
-             + "collect(DISTINCT {term: synSet.uid, url: synSet.url, translation: {name: tlangNode.name, languageCode: tlang.languageCode } } ) AS terms, "
+             + "collect(DISTINCT {tag: synSet.uid, url: synSet.url, translation: {name: tlangNode.name, languageCode: tlang.languageCode } } ) AS tags, "
              + "collect(DISTINCT {type: prop.type, value: ptrans.value}) AS properties, "
-             + "collect(DISTINCT synSet.uid) AS termIDs, " // for filtering into suggestion group...no longer used?
+             + "collect(DISTINCT synSet.uid) AS tagIDs, " // for filtering into suggestion group...no longer used?
              + "{quality: mVote.quality, complexity: mVote.complexity} AS memberVote, "
              + "{quality: gq , complexity: gc } AS globalVote, "
              + "votes, "
             + "re AS resource "
 
-          // determine orderby
+          // detagine orderby
           // TODO: replace with es6 string templates? (here and elsehwere)
           if(req.query.orderby === 'quality'){
             cypher += "ORDER BY COALESCE(globalVote.quality, -1) ";//IS NOT NULL, globalVote.quality DESC  "
@@ -328,9 +328,9 @@ module.exports = function(app, db){
                + "MERGE (resource)-[r:TAGGED_WITH]->(set) "
                + "SET r.connectedBy = {member}, r.dateConnected = TIMESTAMP() "
                + "WITH set "
-               + "MATCH (set)-[sr:IN_SET]-(term:term)-[lang:HAS_TRANSLATION]-(translation:translation)"
+               + "MATCH (set)-[sr:IN_SET]-(tag:tag)-[lang:HAS_TRANSLATION]-(translation:translation)"
                + "WHERE sr.order=1 AND lang.languageCode IN [ 'en' ] " // TODO: need to take user language
-               + "RETURN set as term, translation, set.uid as setID "
+               + "RETURN set as tag, translation, set.uid as setID "
 
     db.query(cypher, {resource: req.params.rUID, set: req.params.sUID, member: res.locals.user.uid },function(err, result) {
       if (err) console.log(err);
@@ -359,7 +359,7 @@ module.exports = function(app, db){
 
   function readFull(req, res){
     /**
-    * fetches and return resource core, meta (in selected language), and tagged terms based on ID.
+    * fetches and return resource core, meta (in selected language), and tagged tags based on ID.
     * language code passed in as "languageCode" by query, default to english
     * @param {Number} id
     * @param {String} languageCode
@@ -368,14 +368,14 @@ module.exports = function(app, db){
 
     var cypher = "MATCH (resource:resource {uid:{uid}}) "
                + "WITH resource "
-               + "OPTIONAL MATCH (resource)-[TAGGED_WITH]->(set:synSet)<-[setR:IN_SET]-(t:term)-[r:HAS_TRANSLATION]->(tr:translation) "
+               + "OPTIONAL MATCH (resource)-[TAGGED_WITH]->(set:synSet)<-[setR:IN_SET]-(t:tag)-[r:HAS_TRANSLATION]->(tr:translation) "
                + "WHERE r.languageCode = {languageCode} AND setR.order=1 "
                + "OPTIONAL MATCH (resource)-[p:HAS_PROPERTY]->(prop:prop)-[plang:HAS_TRANSLATION ]->(ptrans:translation) "
                + "WHERE p.order=1 AND plang.languageCode IN [ {languageCode} , 'en' ] "
                + "WITH resource, "
-               + "COLLECT(DISTINCT { setID: set.uid, term: set, translation: tr}) as terms, "
+               + "COLLECT(DISTINCT { setID: set.uid, tag: set, translation: tr}) as tags, "
                + "COLLECT(DISTINCT {type: prop.type, value: ptrans.value}) AS properties "
-               + "RETURN resource, terms, properties"
+               + "RETURN resource, tags, properties"
 
     db.query(cypher, {uid: req.params.uid, languageCode: req.query.languageCode || 'en'},function(err, result) {
       if (err) {console.log(err); res.status(500).send()};
@@ -467,7 +467,7 @@ module.exports = function(app, db){
         + "OPTIONAL MATCH (other)-[p:HAS_PROPERTY]->(prop:prop)-[plang:HAS_TRANSLATION ]->(ptrans:translation) "
         + "WHERE p.order=1 AND plang.languageCode IN [ {language} , 'en' ] "
         + "RETURN "
-          // + "collect(DISTINCT {term: synSet.uid, url: synSet.url, translation: {name: tlangNode.name, languageCode: tlang.languageCode } } ) AS terms, " //will need to do the optional match if terms needed...
+          // + "collect(DISTINCT {tag: synSet.uid, url: synSet.url, translation: {name: tlangNode.name, languageCode: tlang.languageCode } } ) AS tags, " //will need to do the optional match if tags needed...
           + "collect(DISTINCT {type: prop.type, value: ptrans.value}) AS properties, "
           + "{quality: gq , complexity: gc } AS globalVote, "
           + "votes, "
@@ -527,7 +527,7 @@ module.exports = function(app, db){
     })
   }
 
-  function suggestedTerms(req, res){ // finds and tags terms to resource based on provided text - returns terms tagged
+  function suggestedTags(req, res){ // finds and tags tags to resource based on provided text - returns tags tagged
     var blob = req.body.text;
       var tags =[]
       var nospecial = blob.replace(/[^a-zA-Z0-9 ]/g, "");
@@ -547,21 +547,21 @@ module.exports = function(app, db){
             if(err){console.log(err)}
             callback(null,result)
         })
-      }, function(err, taggedTerms) {
+      }, function(err, taggedTags) {
         if(err){console.log(err)}
-        res.send(taggedTerms)
+        res.send(taggedTags)
       });
 
   }
   function tagResource(uid, snip, callback){
-    var cypher = "MATCH (t:term)-[:IN_SET]->(set:synSet), (res:resource {uid:{ruid}}) "
+    var cypher = "MATCH (t:tag)-[:IN_SET]->(set:synSet), (res:resource {uid:{ruid}}) "
                + "WHERE t.lower = {snip} "
                + "WITH set,res "
-               + "MATCH (translation:translation)<-[lang:HAS_TRANSLATION]-(term:term)-[r:IN_SET]->(set) "
+               + "MATCH (translation:translation)<-[lang:HAS_TRANSLATION]-(tag:tag)-[r:IN_SET]->(set) "
                + "WHERE lang.languageCode IN [ {language} , 'en' ] AND r.order=1 "
                + "WITH set, res, translation "
                + "MERGE (set)<-[rel:TAGGED_WITH]-(res) "
-               + "RETURN DISTINCT set.uid as setID, set as term, translation "
+               + "RETURN DISTINCT set.uid as setID, set as tag, translation "
     //
     db.query(cypher, {ruid: uid, snip: snip, language: 'en' },function(err, result) {
       if (err) console.log(err);

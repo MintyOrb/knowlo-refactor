@@ -1,34 +1,34 @@
 <template>
-<div id='termModal' class="modal fullPage term-modal">
+<div id='tagModal' class="modal fullPage tag-modal">
 
   <!-- modal for adding to discussion -->
   <add-resource v-if='addResource === true' :type='addResourceType' v-on:close="addResource=false" v-on:added="newMeta">
   </add-resource>
 
-  <div class="termTitle">
-    <span v-if="term.term.iconURL && term.term.iconURL.length > 0" class=''>
-					<img class='circle'style='height:60pxwidth:60px' :src="term.term.iconURL">
+  <div class="tagTitle">
+    <span v-if="tag.tag.iconURL && tag.tag.iconURL.length > 0" class=''>
+					<img class='circle'style='height:60pxwidth:60px' :src="tag.tag.iconURL">
 			</span>
     <span>
-				<span>{{term.translation.name}}</span>
+				<span>{{tag.translation.name}}</span>
     </span>
 
     <!-- setdelete -->
-    <!-- <span v-if='true' class='btn' v-on:click="deleteSet(term.setID)">delete set</span> -->
+    <!-- <span v-if='true' class='btn' v-on:click="deleteSet(tag.setID)">delete set</span> -->
 
     <span class="right modal-close"><i class="fa fa-2x fa-times"></i></span>
   </div>
   <!-- flick navigation for isotope containers -->
-  <div class="termMeta">
+  <div class="tagMeta">
     <div class="metaNav">
-      <div v-for="step in termSection" class="navItems">
+      <div v-for="step in tagSection" class="navItems">
         <p>
           {{step}}
         </p>
       </div>
     </div>
     <!-- isotope contianers -->
-    <div class="termSections">
+    <div class="tagSections">
 
       <div class="stepContainer">
 
@@ -37,7 +37,7 @@
         </div>
 
         <div v-for="icon in icons" :key="icon['resource']['uid']">
-          <resource :re="icon" :display="'list'" v-on:vote-cast='evalTopTerm'>
+          <resource :re="icon" :display="'list'" v-on:vote-cast='evalTopTag'>
           </resource>
         </div>
       </div>
@@ -57,31 +57,31 @@
 
       <div class="stepContainer">
         <isotope ref='syno' :list="synonyms" :options='{}'>
-          <term v-for="term in synonyms" :key="term.setID" :term="term" :display="termDisplay" v-on:include="addToQuery(term)" v-on:exclude="removeSynonym(term.term.uid)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)" hide="remove">
-          </term>
+          <tag v-for="tag in synonyms" :key="tag.setID" :tag="tag" :display="tagDisplay" v-on:include="addToQuery(tag)" v-on:exclude="removeSynonym(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
+          </tag>
         </isotope>
         <search :exclude="$route.params.uid" input-id="syn" v-on:select="addSynonym"></search>
       </div>
       <div class="stepContainer">
         <isotope ref='withn' :list="within" :options='{}'>
-          <term :term="term" v-for="term in within" :key="term.translation.name" :display="termDisplay" v-on:include="addToQuery(term)" v-on:exclude="removeWithin(term.term.uid)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)" hide="remove">
-          </term>
-          <!-- v-on:exclude="removeSynonym(term.term.uid)" -->
+          <tag :tag="tag" v-for="tag in within" :key="tag.translation.name" :display="tagDisplay" v-on:include="addToQuery(tag)" v-on:exclude="removeWithin(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
+          </tag>
+          <!-- v-on:exclude="removeSynonym(tag.tag.uid)" -->
         </isotope>
         <search exclude="" input-id="within" v-on:select="addWithin"></search>
       </div>
       <div class="stepContainer">
         <isotope ref='contains' :list="contains" :options='{}'>
-          <term :term="term" v-for="term in contains" :display="termDisplay" :key="term.setID" v-on:include="addToQuery(term)" v-on:exclude="removeContains(term.term.uid)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)" hide="remove">
-          </term>
-          <!-- v-on:exclude="removeSynonym(term.term.uid)" -->
+          <tag :tag="tag" v-for="tag in contains" :display="tagDisplay" :key="tag.setID" v-on:include="addToQuery(tag)" v-on:exclude="removeContains(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
+          </tag>
+          <!-- v-on:exclude="removeSynonym(tag.tag.uid)" -->
         </isotope>
         <search exclude="" input-id="contains" v-on:select="addContains"></search>
       </div>
       <div class="stepContainer">
         <isotope ref='trans' :list="translations" :options='{}'>
-          <term :term="term" v-for="term in translations" :key="term.setID" :display="termDisplay" v-on:include="addToQuery(term)" v-on:exclude="addToQuery(term)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)" hide="remove">
-          </term>
+          <tag :tag="tag" v-for="tag in translations" :key="tag.setID" :display="tagDisplay" v-on:include="addToQuery(tag)" v-on:exclude="addToQuery(tag)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
+          </tag>
         </isotope>
       </div>
     </div>
@@ -95,19 +95,19 @@ import Materialize from 'materialize-css'
 import Router from 'vue-router'
 export default {
   name: 'tag',
-  props: ['termQuery', 'member'],
+  props: ['tagQuery', 'member'],
   data: function () {
     return {
-      term: {
+      tag: {
         name: 'default',
         translation: {
           name: ''
         },
-        term: {
+        tag: {
           iconURL: ''
         }
       },
-      termDisplay: 'list',
+      tagDisplay: 'list',
       modalOpen: false,
       addResource: false,
       addResourceType: '',
@@ -118,7 +118,7 @@ export default {
       within: [],
       contains: [],
       icons: [],
-      termSection: ['Icon', 'Definition', 'Synonyms', 'Within', 'Contains', 'Translations'] // stats? vote? member's relation? definition?
+      tagSection: ['Icon', 'Definition', 'Synonyms', 'Within', 'Contains', 'Translations'] // stats? vote? member's relation? definition?
     }
   },
   methods: {
@@ -128,12 +128,12 @@ export default {
           languageCode: 'en'
         }
       }).then(response => {
-        if (response.body.term) {
-          response.body.term.name = response.body.translation.name
-          response.body.term.status = {}
-          this.term = response.body
+        if (response.body.tag) {
+          response.body.tag.name = response.body.translation.name
+          response.body.tag.status = {}
+          this.tag = response.body
           // this.$route.params.name
-          this.term.setID = this.$route.params.uid
+          this.tag.setID = this.$route.params.uid
           this.fetchSynonyms()
           this.fetchWithin()
           this.fetchContains()
@@ -156,7 +156,7 @@ export default {
     openModal: function () {
       this.modalOpen = true
       this.$nextTick(function () {
-        $('#termModal').modal({
+        $('#tagModal').modal({
           dismissible: true, // Modal can be dismissed by clicking outside of the modal
           opacity: 0.5, // Opacity of modal background
           inDuration: 300, // Transition in duration
@@ -169,7 +169,7 @@ export default {
           complete: () => {
             if ($('.metaNav').flickity()) {
               $('.metaNav').flickity('destroy')
-              $('.termSections').flickity('destroy')
+              $('.tagSections').flickity('destroy')
             }
             $('body').css('overflow', 'auto')
             Router.push('/')
@@ -177,14 +177,14 @@ export default {
         }).modal('open')
       })
     },
-    evalTopTerm: function () {
+    evalTopTag: function () {
       const top = this.icons.reduce(function (prev, current) {
         return (prev.globalVote.quality > current.globalVote.quality) ? prev : current
       })
-      if (top.resource.mThumb !== this.term.term.iconURL && top.globalVote.quality !== null) {
+      if (top.resource.mThumb !== this.tag.tag.iconURL && top.globalVote.quality !== null) {
         // triggering new top icon from the front end is probably stupid.
-        this.term.term.iconURL = top.resource.mThumb
-        this.$http.put('/api/set/' + this.term.setID + '/' + top.resource.uid + '/newTopIcon').then(response => {
+        this.tag.tag.iconURL = top.resource.mThumb
+        this.$http.put('/api/set/' + this.tag.setID + '/' + top.resource.uid + '/newTopIcon').then(response => {
           Materialize.toast('New top icon!', 4000)
         }, response => {
           Materialize.toast('Something went wrong...are you online?', 4000)
@@ -263,8 +263,8 @@ export default {
         Materialize.toast('Something went wrong...are you online?', 4000)
       })
     },
-    addSynonym: function (synonym) { // TODO: this merges sets...need a separate method for adding term to set
-      this.$http.put('/api/set/' + this.term.setID + '/synonym/' + synonym.setID).then(response => {
+    addSynonym: function (synonym) { // TODO: this merges sets...need a separate method for adding tag to set
+      this.$http.put('/api/set/' + this.tag.setID + '/synonym/' + synonym.setID).then(response => {
         if (response.body) {
           Materialize.toast('Added!', 4000)
           this.synonyms.push(synonym)
@@ -276,10 +276,10 @@ export default {
       })
     },
     removeSynonym: function (synUID) {
-      this.$http.delete('/api/set/' + this.term.setID + '/synonym/' + synUID).then(response => {
+      this.$http.delete('/api/set/' + this.tag.setID + '/synonym/' + synUID).then(response => {
         if (response.body) {
           Materialize.toast('Removed!', 4000)
-          this.synonyms.splice(this.synonyms.findIndex((term) => term.term.uid === synUID), 1)
+          this.synonyms.splice(this.synonyms.findIndex((tag) => tag.tag.uid === synUID), 1)
         } else {
           Materialize.toast('Something went wrong...', 4000)
         }
@@ -288,7 +288,7 @@ export default {
       })
     },
     fetchWithin: function () {
-      this.$http.get('/set/' + this.term.setID + '/within/', {
+      this.$http.get('/set/' + this.tag.setID + '/within/', {
         params: {
           languageCode: 'en'
         }
@@ -303,7 +303,7 @@ export default {
       })
     },
     addWithin: function (within) {
-      this.$http.put('/api/set/' + this.term.setID + '/within/' + within.term.uid).then(response => {
+      this.$http.put('/api/set/' + this.tag.setID + '/within/' + within.tag.uid).then(response => {
         if (response.body) {
           Materialize.toast('Added!', 4000)
           this.within.push(within)
@@ -315,10 +315,10 @@ export default {
       })
     },
     removeWithin: function (uid) {
-      this.$http.delete('/api/set/' + this.term.setID + '/within/' + uid).then(response => {
+      this.$http.delete('/api/set/' + this.tag.setID + '/within/' + uid).then(response => {
         if (response.body) {
           Materialize.toast('Removed!', 4000)
-          this.within.splice(this.within.findIndex((term) => term.term.uid === uid), 1)
+          this.within.splice(this.within.findIndex((tag) => tag.tag.uid === uid), 1)
         } else {
           Materialize.toast('Something went wrong...', 4000)
         }
@@ -327,7 +327,7 @@ export default {
       })
     },
     fetchContains: function () {
-      this.$http.get('/set/' + this.term.setID + '/contains/', {
+      this.$http.get('/set/' + this.tag.setID + '/contains/', {
         params: {
           languageCode: 'en'
         }
@@ -335,7 +335,7 @@ export default {
         if (response.body.length > 0) {
           this.contains = response.body
         } else {
-          Materialize.toast('Contains no terms.', 4000)
+          Materialize.toast('Contains no tags.', 4000)
           this.contains = []
         }
       }, response => {
@@ -343,7 +343,7 @@ export default {
       })
     },
     addContains: function (contains) {
-      this.$http.put('/api/set/' + this.term.setID + '/contains/' + contains.term.uid).then(response => {
+      this.$http.put('/api/set/' + this.tag.setID + '/contains/' + contains.tag.uid).then(response => {
         if (response.body) {
           Materialize.toast('Added!', 4000)
           this.contains.push(contains)
@@ -355,10 +355,10 @@ export default {
       })
     },
     removeContains: function (uid) {
-      this.$http.delete('/api/set/' + this.term.setID + '/contains/' + uid).then(response => {
+      this.$http.delete('/api/set/' + this.tag.setID + '/contains/' + uid).then(response => {
         if (response.body) {
           Materialize.toast('Removed!', 4000)
-          this.contains.splice(this.contains.findIndex((term) => term.term.uid === uid), 1)
+          this.contains.splice(this.contains.findIndex((tag) => tag.tag.uid === uid), 1)
         } else {
           Materialize.toast('Something went wrong...', 4000)
         }
@@ -379,19 +379,19 @@ export default {
     },
     addToQuery: function (item) {
       this.$emit('add', item)
-      $('#termModal').modal('close')
+      $('#tagModal').modal('close')
     }
   },
   mounted: function () {
     this.init()
     $('.metaNav').flickity({
-      asNavFor: '.termSections',
+      asNavFor: '.tagSections',
       pageDots: false,
       prevNextButtons: false,
       accessibility: false // to prevent jumping when focused
     })
 
-    $('.termSections').flickity({
+    $('.tagSections').flickity({
       wrapAround: true,
       pageDots: false,
       prevNextButtons: true,
@@ -400,7 +400,7 @@ export default {
     })
 
     // TODO: set flickity tab in URL
-    $('.termSections').flickity('selectCell', 1, true, true) //  value, isWrapped, isInstant
+    $('.tagSections').flickity('selectCell', 1, true, true) //  value, isWrapped, isInstant
   },
   beforeRouteLeave: function (to, from, next) {
     $('body').css('overflow', 'auto')

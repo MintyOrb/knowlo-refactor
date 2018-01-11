@@ -1,4 +1,4 @@
-<template :term-query='termQuery' :member='member'>
+<template :tag-query='tagQuery' :member='member'>
   <div id='addResourceModal' class='modal modal-fixed-footer'>
   <div class="addMeta modal-content">
   <div class="addNav">
@@ -105,13 +105,13 @@
    				 </div>
   </div>
   <isotope ref='tagged' :list="tags" :options='{}'>
-  <div v-for="term in tags" :key="term.setID">
-  <term :term="term"
+  <div v-for="tag in tags" :key="tag.setID">
+  <tag :tag="tag"
   :display="'thumb'"
-  :key="term.setID"
+  :key="tag.setID"
   hide="lens include focus info pin"
-  v-on:remove="removeTerm(term.setID)">
-  </term>
+  v-on:remove="removeTag(tag.setID)">
+  </tag>
   </div>
   </isotope>
   </div>
@@ -241,10 +241,10 @@ export default {
         Materialize.toast('Add a resource before taggging!', 4000)
       }
     },
-    addTag (term) { // add tag(s) to the newly created resource
-      console.log('in add tag ', term)
+    addTag (tag) { // add tag(s) to the newly created resource
+      console.log('in add tag ', tag)
       if (this.resource.core.uid.length > 0) {
-        this.$http.put('/api/resource/' + this.resource.core.uid + '/set/' + term.setID).then(response => {
+        this.$http.put('/api/resource/' + this.resource.core.uid + '/set/' + tag.setID).then(response => {
           if (response.body) {
             console.log(response.body)
             this.tags.push(response.body)
@@ -258,11 +258,11 @@ export default {
         Materialize.toast('Add a resource before tagging!', 4000)
       }
     },
-    removeTerm (uid) {
+    removeTag (uid) {
       // TODO: revert discussion filter switch if discussion set removed by exclude
       this.$http.delete('/api/resource/' + this.resource.core.uid + '/set/' + uid).then(response => {
         if (response.body) {
-          this.tags.splice(this.tags.findIndex((term) => term.setID === uid), 1)
+          this.tags.splice(this.tags.findIndex((tag) => tag.setID === uid), 1)
         } else {
           Materialize.toast('Something went wrong...', 4000)
         }
@@ -270,7 +270,7 @@ export default {
         Materialize.toast('Something went wrong...are you online and logged in?', 4000)
       })
     },
-    getSuggestedTerms () { // find terms in text and tag to resource
+    getSuggestedTags () { // find tags in text and tag to resource
       var textBlob = ''
       textBlob = textBlob.concat( // single string to consider
         ' ' + this.resource.detail.title,
@@ -279,10 +279,10 @@ export default {
         ' ' + this.resource.detail.description
       )
       // find and tag to resource
-      this.$http.put('/api/resource/' + this.resource.core.uid + '/termSuggest', {text: textBlob}).then(response => {
+      this.$http.put('/api/resource/' + this.resource.core.uid + '/tagSuggest', {text: textBlob}).then(response => {
         if (response.body) {
           this.tags = response.body
-          // for each this.tags.push(term) push to tags?
+          // for each this.tags.push(tag) push to tags?
         } else {
           Materialize.toast('Something went wrong...', 4000)
         }
@@ -326,7 +326,7 @@ export default {
           }
           this.$emit('added', holder)
           if (!this.synSetMeta) {
-            this.getSuggestedTerms()
+            this.getSuggestedTags()
             $('.addSections').flickity('selectCell', 1, true, false) //  value, isWrapped, isInstant
           }
         } else {
@@ -346,7 +346,7 @@ export default {
     } // else connect to neither (standalone resource)
     this.open()
     $('.modal-overlay').eq(1).appendTo('.resource-modal') // workaround for stacking context
-    $('.modal-overlay').eq(1).appendTo('#termModal') // workaround for stacking context
+    $('.modal-overlay').eq(1).appendTo('#tagModal') // workaround for stacking context
   },
   beforeRouteLeave (to, from, next) {
     if ($('#addResourceModal')) {
@@ -365,7 +365,7 @@ export default {
       }
       for (var bIndex in before) {
         if (!now.includes(before[bIndex])) {
-          this.removeTerm(this.dIDs[before[bIndex]])
+          this.removeTag(this.dIDs[before[bIndex]])
         }
       }
     }

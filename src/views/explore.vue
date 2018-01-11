@@ -1,7 +1,7 @@
 <template>
 <div style='min-height:100vh;'>
-  <!-- view for term and resource page -->
-  <router-view :member='member' :term-Query='termQuery' v-on:add='addToQuery'></router-view>
+  <!-- view for tag and resource page -->
+  <router-view :member='member' :tag-Query='tagQuery' v-on:add='addToQuery'></router-view>
 
 
   <!-- <router-link :to="{ name: 'addResource'}">
@@ -15,37 +15,37 @@
         <search exclude="" input-id="mainSearch" holder-text="Search" v-on:select="addToQuery"></search>
 
         <transition-group name='fade'>
-          <span v-for="term in termQuery" @click.stop.prevent='removeTerm(term.setID)' :key="term.setID">
-  							<img v-if="term.term.iconURL" class='circle hoverable' style='height:40px;width:40px;margin-right:10px;padding:3px;' :src="term.term.iconURL" />
-  							<span v-else class='circle hoverable' style='text-align:center;padding:10px;width:40px;width:40px;position:absolute;font-size;2em' >{{term.translation.name[0]}}</span>
+          <span v-for="tag in tagQuery" @click.stop.prevent='removeTag(tag.setID)' :key="tag.setID">
+  							<img v-if="tag.tag.iconURL" class='circle hoverable' style='height:40px;width:40px;margin-right:10px;padding:3px;' :src="tag.tag.iconURL" />
+  							<span v-else class='circle hoverable' style='text-align:center;padding:10px;width:40px;width:40px;position:absolute;font-size;2em' >{{tag.translation.name[0]}}</span>
           </span>
         </transition-group>
 
         <span class='right'>
-  						{{termQuery.length}} term<span v-if="termQuery.length !==1">s</span> in search
-        <span v-if="termQuery.length > 0" class="clear btn white waves-light" @click.stop.prevent="termQuery=[]">
+  						{{tagQuery.length}} tag<span v-if="tagQuery.length !==1">s</span> in search
+        <span v-if="tagQuery.length > 0" class="clear btn white waves-light" @click.stop.prevent="tagQuery=[]">
   							clear
   						</span>
         </span>
       </div>
       <div class='container collapsible-body'>
 
-        <!-- term query  -->
+        <!-- tag query  -->
         <div class='row'>
-          <isotope style="min-height:150px" ref="termQuery" :list="termQuery" :options='{}' >
-            <tag v-for="term in termQuery" :key="term.setID" :term="term" display="thumb" v-on:include="removeTerm(term.setID)" v-on:remove="removeTerm(term.setID)" v-on:focus="focus" v-on:lens="fetchContains" v-on:main="removeTerm(term.setID)">
+          <isotope style="min-height:150px" ref="tagQuery" :list="tagQuery" :options='{}' >
+            <tag v-for="tag in tagQuery" :key="tag.setID" :tag="tag" display="thumb" v-on:include="removeTag(tag.setID)" v-on:remove="removeTag(tag.setID)" v-on:focus="focus" v-on:lens="fetchContains" v-on:main="removeTag(tag.setID)">
             </tag>
           </isotope>
-          <div v-if="termQuery.length > 0" class="clear btn white waves-light" @click="termQuery=[]">
+          <div v-if="tagQuery.length > 0" class="clear btn white waves-light" @click="tagQuery=[]">
             clear
           </div>
         </div>
       </div>
     </li>
-    <li data-pane="terms">
-      <div class="collapsible-header"><i class="fa fa-filter"></i>Refine | Terms | Suggestions</div>
+    <li data-pane="tags">
+      <div class="collapsible-header"><i class="fa fa-filter"></i>Refine | Tags | Suggestions</div>
       <div class="collapsible-body">
-        <form id='termSuggestionOptions'>
+        <form id='tagSuggestionOptions'>
           <!-- <span>
   				      <input v-model="suggestionDisplay" class="with-gap" name="group1" type="radio" value='size' id="size" />
   				      <label for="size">Size</label>
@@ -78,15 +78,15 @@
             <div v-if="suggestionDisplay !=='none'">
               <div id='suggestionNav' class=" suggestionNav " :class="{ shadowUnder : 'groups disciplines'.indexOf(suggestionDisplay) > -1}">
                 <!-- flickity navigation for isotope containers -->
-                <tag v-for="group in termSuggestions" :key="group.group[0].setID" :term="group.group[0]" :display="'thumb'" :persist-action="false" hide="remove lens" v-on:include="addToQuery(group.group[0])" v-on:exclude="addToQuery(group.group[0])" v-on:focus="addToQuery(group.group[0])"
+                <tag v-for="group in tagSuggestions" :key="group.group[0].setID" :tag="group.group[0]" :display="'thumb'" :persist-action="false" hide="remove lens" v-on:include="addToQuery(group.group[0])" v-on:exclude="addToQuery(group.group[0])" v-on:focus="addToQuery(group.group[0])"
                   v-on:pin="addToQuery(group.group[0])">
                 </tag>
               </div>
               <!-- isotope contianers -->
               <div id='suggestionSteps' class=" suggestionSteps">
-                <div v-for="step in termSuggestions" class="suggestionGroupStep">
+                <div v-for="step in tagSuggestions" class="suggestionGroupStep">
                   <isotope :ref='"suggestionBin" + step.group[0].setID' :list="step.contains" :options='{}'>
-                    <tag v-for="term in step.contains" :key="term.setID" :term="term" :display="'list'" v-on:main="addToQuery(term)" v-on:include="addToQuery(term)" v-on:exclude="addToQuery(term)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)">
+                    <tag v-for="tag in step.contains" :key="tag.setID" :tag="tag" :display="'list'" v-on:main="addToQuery(tag)" v-on:include="addToQuery(tag)" v-on:exclude="addToQuery(tag)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)">
                     </tag>
                   </isotope>
                 </div>
@@ -96,24 +96,24 @@
             <!-- <div v-if="'size disciplines time'.indexOf(suggestionDisplay) > -1">
   									<div id='suggestionNav' class=" suggestionNav ">
   										<tag
-  											v-for="term in termSuggestions"
-  											:key="term.setID"
-  											:term="term"
+  											v-for="tag in tagSuggestions"
+  											:key="tag.setID"
+  											:tag="tag"
   											:display="'thumb'"
   											hide="remove lens"
-  											v-on:main="addToQuery(term)"
-  											v-on:include="addToQuery(term)"
-  											v-on:exclude="addToQuery(term)"
-  											v-on:focus="addToQuery(term)"
-  											v-on:pin="addToQuery(term)"
+  											v-on:main="addToQuery(tag)"
+  											v-on:include="addToQuery(tag)"
+  											v-on:exclude="addToQuery(tag)"
+  											v-on:focus="addToQuery(tag)"
+  											v-on:pin="addToQuery(tag)"
   										>
                     </tag>
   									</div>
   								</div> -->
             <!-- suggestions un-grouped iso -->
             <div v-if="' none '.indexOf(suggestionDisplay) > -1">
-              <isotope ref="together" :list="termSuggestions" :options='{}' >
-                <tag v-for="term in termSuggestions" :key="term.setID" :term="term" :display="'thumb'" v-on:main="addToQuery(term)" v-on:include="addToQuery(term)" v-on:exclude="addToQuery(term)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)">
+              <isotope ref="together" :list="tagSuggestions" :options='{}' >
+                <tag v-for="tag in tagSuggestions" :key="tag.setID" :tag="tag" :display="'thumb'" v-on:main="addToQuery(tag)" v-on:include="addToQuery(tag)" v-on:exclude="addToQuery(tag)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)">
                 </tag>
               </isotope>
             </div>
@@ -158,8 +158,8 @@
         </div>
         <!-- <transition name="fade">
 							<div>
-								<tag v-for="term in base"
-									:term="term"
+								<tag v-for="tag in base"
+									:tag="tag"
 									:display="'thumb'"
 									>
 								</tag>
@@ -170,7 +170,7 @@
           <div id='crossSectionNav' class=" crossSectionNav ">
             <!-- flick navigation for isotope containers -->
             <div v-for="step in crossSection">
-              <tag :term="step" :display="'thumb'">
+              <tag :tag="step" :display="'thumb'">
               </tag>
             </div>
           </div>
@@ -184,7 +184,7 @@
               <div id='crossSectionSteps' class=" crossSectionSteps">
                 <div v-for="step in crossSection" class="stepContainer">
                   <isotope :ref='"resourceBin" + step.setID' :list="resources" :options='{}'>
-                    <resource :key="re.resource.uid" v-for="re in resources" v-if="re.termIDs.includes(step.setID)" :re="re" :display="resourceDisplay">
+                    <resource :key="re.resource.uid" v-for="re in resources" v-if="re.tagIDs.includes(step.setID)" :re="re" :display="resourceDisplay">
                     </resource>
                   </isotope>
                 </div>
@@ -239,22 +239,22 @@ export default {
   name: 'explore',
   components: { tag, resource, search, Spinner, isotope },
   directives: {infiniteScroll},
-  props: ['termQuery', 'member'],
+  props: ['tagQuery', 'member'],
   data () {
     return {
       db: null, // search results to display - array of material objects
       loginCheck: false, // true after login status is checked
-      crossSection: null, // object containing the name of the cross section and terms in lens group - object containing array of term objects and string name
-      termSuggestions: [], // holds suggestion groups and terms within
-      suggestionDisplay: '', // the name of the currently selected display for term suggestions
-      suggestions: [], // suggested terms - array of term objects
-      resources: [], // db when no lens, replace with db even though less items? - array of term objects
+      crossSection: null, // object containing the name of the cross section and tags in lens group - object containing array of tag objects and string name
+      tagSuggestions: [], // holds suggestion groups and tags within
+      suggestionDisplay: '', // the name of the currently selected display for tag suggestions
+      suggestions: [], // suggested tags - array of tag objects
+      resources: [], // db when no lens, replace with db even though less items? - array of tag objects
       showViewed: false, // whether or not viewed resources should be returned.
       resourcesRelated: null, // total number of resources related
       resourcesViewed: null, // number of related resources logged in member has viwed
       resourceDisplay: null, // display option for materials in search result - string name of displaytype (thumb, list, card)
       searchStr: null, // current member entered search text - string
-      selectedPane: 'resources', // current selected selectedPane (search, terms, or resources)
+      selectedPane: 'resources', // current selected selectedPane (search, tags, or resources)
       endOfResources: false, // status for reached end of infinite scroll
       loadingResources: false, // status for fetching resources
       orderby: 'quality', // order for returned resources (quality, complexity, number of views, etc.)
@@ -288,24 +288,24 @@ export default {
       })
     },
     includeSearch (set) {
-      if (!this.termQuery.includes(set.setID)) {
-        this.termQuery.push(set)
+      if (!this.tagQuery.includes(set.setID)) {
+        this.tagQuery.push(set)
       }
       this.removeFrom(set, this.suggestions)
     },
     focus (set) {
       set.status.focusIcon = false
-      var tIndex = this.termQuery.length
+      var tIndex = this.tagQuery.length
       while (tIndex--) {
-        if (!this.termQuery[tIndex].status.pinnedIcon && this.termQuery[tIndex].setID !== set.setID) this.termQuery.splice(tIndex, 1)
+        if (!this.tagQuery[tIndex].status.pinnedIcon && this.tagQuery[tIndex].setID !== set.setID) this.tagQuery.splice(tIndex, 1)
       }
     },
-    addToFrom (term, to, from) { /// this is all stupid and needs to be re thought.
+    addToFrom (tag, to, from) { /// this is all stupid and needs to be re thought.
       if (to) {
-        this.addTo(term, to)
+        this.addTo(tag, to)
       }
       if (from) {
-        this.removeFrom(term, from)
+        this.removeFrom(tag, from)
       }
 
       this.filter('keywords')
@@ -318,9 +318,9 @@ export default {
         if (theArray[i].setID === item.setID) theArray.splice(i, 1)
       }
     },
-    removeTerm (id) {
-      for (var i = this.termQuery.length - 1; i >= 0; i--) {
-        if (this.termQuery[i].setID === id) this.termQuery.splice(i, 1)
+    removeTag (id) {
+      for (var i = this.tagQuery.length - 1; i >= 0; i--) {
+        if (this.tagQuery[i].setID === id) this.tagQuery.splice(i, 1)
       }
     },
     flipViewed () {
@@ -343,14 +343,14 @@ export default {
     },
     addToQuery (item) {
       item.connections = 0
-      if (item.persistAction) { // this is handled really poorly...neeed to rethink term comp. Also, this doesn't work for pin
+      if (item.persistAction) { // this is handled really poorly...neeed to rethink tag comp. Also, this doesn't work for pin
         item.status.includeIcon = true
       }
       if (item.status.focusIcon) {
         this.focus(item)
       }
-      if (this.termQuery.every(x => x.setID !== item.setID)) { // don't add if already in query
-        this.termQuery.push(item)
+      if (this.tagQuery.every(x => x.setID !== item.setID)) { // don't add if already in query
+        this.tagQuery.push(item)
       } else {
         Materialize.toast('Already in query!', 1500)
       }
@@ -401,21 +401,21 @@ export default {
     shuffle (key) {
       this.$refs.resourceBin.shuffle()
       this.$refs.key.shuffle()
-      this.$refs.termQuery.shuffle()
+      this.$refs.tagQuery.shuffle()
     },
     layout () {
-      if (this.termSuggestions.length > 0 && this.suggestionDisplay === 'groups' && this.selectedPane === 'terms') {
-        for (var termIndex in this.termSuggestions) { // layout all isotope containers in term termSuggestions
-          if (this.$refs['suggestionBin' + this.termSuggestions[termIndex].group[0].setID] && this.$refs['suggestionBin' + this.termSuggestions[termIndex].group[0].setID][0]) {
-            this.$refs['suggestionBin' + this.termSuggestions[termIndex].group[0].setID][0].layout('masonry')
+      if (this.tagSuggestions.length > 0 && this.suggestionDisplay === 'groups' && this.selectedPane === 'tags') {
+        for (var tagIndex in this.tagSuggestions) { // layout all isotope containers in tag tagSuggestions
+          if (this.$refs['suggestionBin' + this.tagSuggestions[tagIndex].group[0].setID] && this.$refs['suggestionBin' + this.tagSuggestions[tagIndex].group[0].setID][0]) {
+            this.$refs['suggestionBin' + this.tagSuggestions[tagIndex].group[0].setID][0].layout('masonry')
           }
         }
       }
-      for (termIndex in this.crossSection) { // layout all isotope containers in cross section
-        this.$refs['resourceBin' + this.crossSection[termIndex].setID][0].layout('masonry')
+      for (tagIndex in this.crossSection) { // layout all isotope containers in cross section
+        this.$refs['resourceBin' + this.crossSection[tagIndex].setID][0].layout('masonry')
       }
-      if (this.$refs.termQuery && this.selectedPane === 'search') {
-        this.$refs.termQuery.layout('masonry')
+      if (this.$refs.tagQuery && this.selectedPane === 'search') {
+        this.$refs.tagQuery.layout('masonry')
       }
       if (this.selectedPane === 'resources' && this.$refs.resourceBin && (!this.crossSection || this.crossSection.length === 0)) {
         this.$refs.resourceBin.layout('masonry')
@@ -467,16 +467,16 @@ export default {
         }
       }
     },
-    getTerms () {
+    getTags () {
       if ('size disciplines time'.indexOf(this.suggestionDisplay) > -1) { // this is dumb and should be untangled.
-        this.getBatchTerms()
+        this.getBatchTags()
       } else {
         var include = []
         // var exclude = []
-        for (var termIndex = 0; termIndex < this.termQuery.length; termIndex++) {
-          include.push(this.termQuery[termIndex].setID)
+        for (var tagIndex = 0; tagIndex < this.tagQuery.length; tagIndex++) {
+          include.push(this.tagQuery[tagIndex].setID)
         }
-        this.termSuggestions = []
+        this.tagSuggestions = []
         this.$http.get('/api/set/', {
           params: {
             languageCode: 'en',
@@ -485,9 +485,9 @@ export default {
             type: this.suggestionDisplay
           }
         }).then(response => {
-          this.termSuggestions = response.body
+          this.tagSuggestions = response.body
 
-          if (this.termSuggestions.length === 0) {
+          if (this.tagSuggestions.length === 0) {
             this.suggestionDisplay = 'disciplines'
             Materialize.toast('No tags found...', 2000)
           }
@@ -497,32 +497,32 @@ export default {
         })
       }
     },
-    getBatchTerms () {
+    getBatchTags () {
       var scaleIDs = {
         'size': 'BJgVf2ZQYW',
         'disciplines': 'Bylx_hVBa-',
         'time': 'BJNgnDdk-'
       }
       var id = scaleIDs[this.suggestionDisplay]
-      this.termSuggestions = []
+      this.tagSuggestions = []
       this.$http.get('/api/set/' + id + '/crossSection', {
         params: {
           languageCode: 'en'
         }
       }).then(response => {
         for (var x in response.body) {
-          if (response.body[x].contains[0].term === null) {
+          if (response.body[x].contains[0].tag === null) {
             response.body[x].contains = []
           }
           if (response.body[x].group[0].translation === null) {
             response.body[x].group[0].translation = ''
             console.log('I need to be dealt with - improve query.')
-            // no translation because contains no terms
+            // no translation because contains no tags
           }
         }
-        this.termSuggestions = response.body
+        this.tagSuggestions = response.body
 
-        if (this.termSuggestions.length === 0) {
+        if (this.tagSuggestions.length === 0) {
           this.suggestionDisplay = 'size'
         }
         this.$nextTick(() => {
@@ -539,7 +539,7 @@ export default {
         if (response.body.length > 0) {
           this.changeLens(response.body)
         } else {
-          Materialize.toast('Contains no terms.', 4000)
+          Materialize.toast('Contains no tags.', 4000)
         }
       }, response => {
         Materialize.toast('Something went wrong...are you online?', 4000)
@@ -560,11 +560,11 @@ export default {
         if (infinite) { // only skip if infinite scrolling
           skip = this.resources.length
         }
-        for (var termIndex = 0; termIndex < this.termQuery.length; termIndex++) {
-          if (this.termQuery[termIndex]['status'].includeIcon) {
-            include.push(this.termQuery[termIndex]['setID'])
+        for (var tagIndex = 0; tagIndex < this.tagQuery.length; tagIndex++) {
+          if (this.tagQuery[tagIndex]['status'].includeIcon) {
+            include.push(this.tagQuery[tagIndex]['setID'])
           } else {
-            exclude.push(this.termQuery[termIndex]['setID'])
+            exclude.push(this.tagQuery[tagIndex]['setID'])
           }
         }
         if (this.member.uid !== null) { // member specific query if logged in
@@ -626,11 +626,11 @@ export default {
     fetchResourceQuantity () {
       var include = []
       var exclude = []
-      for (var termIndex = 0; termIndex < this.termQuery.length; termIndex++) {
-        if (this.termQuery[termIndex]['status'].includeIcon) {
-          include.push(this.termQuery[termIndex]['setID'])
+      for (var tagIndex = 0; tagIndex < this.tagQuery.length; tagIndex++) {
+        if (this.tagQuery[tagIndex]['status'].includeIcon) {
+          include.push(this.tagQuery[tagIndex]['setID'])
         } else {
-          exclude.push(this.termQuery[termIndex]['setID'])
+          exclude.push(this.tagQuery[tagIndex]['setID'])
         }
       }
       if (this.member.uid !== null) { // member specific query if logged in
@@ -725,7 +725,7 @@ export default {
             this.selectedPane = 'resources'
             $('.exploreBins').collapsible('open', 2)
           } else {
-            this.selectedPane = 'terms'
+            this.selectedPane = 'tags'
             $('.exploreBins').collapsible('open', 1)
           }
         }
@@ -749,7 +749,7 @@ export default {
     }, 500)
   },
   watch: {
-    member (newVal, oldVal) { // re-fetch resources/terms on member login/logout
+    member (newVal, oldVal) { // re-fetch resources/tags on member login/logout
       this.loginCheck = true
       this.$nextTick(x => {
         this.fetchResourceQuantity()
@@ -758,17 +758,17 @@ export default {
         }
       })
     },
-    termQuery (val, x) {
-      if (this.termQuery.length === 0) {
+    tagQuery (val, x) {
+      if (this.tagQuery.length === 0) {
         this.suggestionDisplay = 'disciplines'
       }
-      Cookies.set('termQuery', val)
+      Cookies.set('tagQuery', val)
       if (this.loginCheck) { // don't fetch before checking member login
         this.$nextTick(() => {
           if (this.selectedPane === 'resources') {
             this.fetchResources()
-          } else if (this.selectedPane === 'terms') {
-            this.getTerms() // only get terms if not loaded or set to groups or ungrouped
+          } else if (this.selectedPane === 'tags') {
+            this.getTags() // only get tags if not loaded or set to groups or ungrouped
           }
           this.fetchResourceQuantity()
         })
@@ -777,7 +777,7 @@ export default {
     suggestionDisplay (val, x) {
       Cookies.set('suggestionDisplay', val)
       if (x.length > 0) {
-        this.getTerms()
+        this.getTags()
       }
     },
     selectedPane (newVal, oldVal) {
@@ -786,8 +786,8 @@ export default {
         this.$nextTick(() => {
           $('.dropdown-button').dropdown() // init order-by dropdown
         })
-      } else if (newVal !== oldVal && newVal === 'terms') {
-        this.getTerms()
+      } else if (newVal !== oldVal && newVal === 'tags') {
+        this.getTags()
       }
       this.layout()
     }
@@ -914,12 +914,12 @@ export default {
   width: 100%;
   margin-left: 0%;
 }
-#termSuggestionOptions {
+#tagSuggestionOptions {
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
 }
-#termSuggestionOptions span {
+#tagSuggestionOptions span {
   margin: 10px 20px 0px 20px;
   width: 110px;
 }

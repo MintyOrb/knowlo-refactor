@@ -10,11 +10,11 @@ module.exports = function(app, db){
   app.post('/api/auth/member', createCore);    // create (or update, if present) a member core node.
   app.delete('/api/auth/member', deleteCore);  // delete member core node and relationships....and translations?
 
-  // app.get('/member/:rid/term/', readTerms);          // retrieve a members tagged terms
-  // app.put('/member/:rid/term/', updateTerms);        // batch add terms to member (with ids) - adds provided tags, doesn't remove relationships
-  // app.post('/member/:rid/term/', batchSetTerms);     // batch set terms to member (with ids) - delete all tags relationships and create for  tags provided
-  // app.put('/member/:rid/term/:id', setTerm);         // add a single term to a members by id
-  // app.delete('/member/:rid/term/:id', deleteTerm);   // remove a single term relationship from a members | DELETE /term/:id to delete term node itself
+  // app.get('/member/:rid/tag/', readTags);          // retrieve a members tagged tags
+  // app.put('/member/:rid/tag/', updateTags);        // batch add tags to member (with ids) - adds provided tags, doesn't remove relationships
+  // app.post('/member/:rid/tag/', batchSetTags);     // batch set tags to member (with ids) - delete all tags relationships and create for  tags provided
+  // app.put('/member/:rid/tag/:id', setTag);         // add a single tag to a members by id
+  // app.delete('/member/:rid/tag/:id', deleteTag);   // remove a single tag relationship from a members | DELETE /tag/:id to delete tag node itself
 
   function publicRead(req, res){
     console.log(req.params)
@@ -80,9 +80,9 @@ module.exports = function(app, db){
     var cypher = "MATCH (mem:member {uid:{muid}}) "
                + "MATCH (mem)-[v:VIEWED]->(re:resource)-[:TAGGED_WITH]->(sets:synSet) "
                + "WITH sets, count(*) as count "
-               + "OPTIONAL MATCH (sets)-[setR:IN_SET]-(:term)-[:HAS_TRANSLATION {languageCode: {language} }]->(translation:translation) "
+               + "OPTIONAL MATCH (sets)-[setR:IN_SET]-(:tag)-[:HAS_TRANSLATION {languageCode: {language} }]->(translation:translation) "
                + "WHERE setR.order=1 "
-               + "RETURN translation, sets as term, sets.uid AS setID, "
+               + "RETURN translation, sets as tag, sets.uid AS setID, "
                + " count  "
                + "ORDER BY  count desc LIMIT 20 "
 
@@ -102,9 +102,9 @@ module.exports = function(app, db){
                + "MATCH (mem)-[v:VIEWED]->(re:resource)-[:TAGGED_WITH]->(sets:synSet)-[gOrder:IN_SET]->(group:synSet) "
                + "WHERE group.uid = {groupUID} "
                + "WITH sets, gOrder, count(*) as count "
-               + "OPTIONAL MATCH (sets)-[setR:IN_SET]-(:term)-[:HAS_TRANSLATION {languageCode: {language} }]->(translation:translation) "
+               + "OPTIONAL MATCH (sets)-[setR:IN_SET]-(:tag)-[:HAS_TRANSLATION {languageCode: {language} }]->(translation:translation) "
                + "WHERE setR.order=1 "
-               + "RETURN translation, sets as term, sets.uid AS setID, "
+               + "RETURN translation, sets as tag, sets.uid AS setID, "
                + "gOrder.order as order, count  "
                + "ORDER BY  order "
 

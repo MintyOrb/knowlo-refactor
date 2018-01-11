@@ -21,9 +21,9 @@
       <div class="resourceStep">
         <radar class="rchart" :data="scale.data" :data-label="scale.dataLabel" :labels="scale.labels"></radar>
         <isotope ref='scale' :list="scale.all" :options='{}'>
-          <div v-for="term in scale.all" :key="term.setID">
-            <term :term="term" :display="'thumb'" :key="term.setID" v-on:include="addToQuery(term)" v-on:exclude="removeSynonym(term.term.uid)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)">
-            </term>
+          <div v-for="tag in scale.all" :key="tag.setID">
+            <tag :tag="tag" :display="'thumb'" :key="tag.setID" v-on:include="addToQuery(tag)" v-on:exclude="removeSynonym(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)">
+            </tag>
           </div>
         </isotope>
       </div>
@@ -55,9 +55,9 @@
 
       <div class="resourceStep discussion">
         <isotope ref='top' :list="top" :options='{}'>
-          <div v-for="term in top" :key="term.setID">
-            <term :term="term" :display="'thumb'" :key="term.setID" v-on:include="addToQuery(term)" v-on:exclude="removeSynonym(term.term.uid)" v-on:focus="addToQuery(term)" v-on:pin="addToQuery(term)">
-            </term>
+          <div v-for="tag in top" :key="tag.setID">
+            <tag :tag="tag" :display="'thumb'" :key="tag.setID" v-on:include="addToQuery(tag)" v-on:exclude="removeSynonym(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)">
+            </tag>
           </div>
         </isotope>
       </div>
@@ -79,7 +79,7 @@ export default {
   props: ['member'],
   data () {
     return {
-      memberSection: ['Time By Discpline', 'Stats', 'History', 'Top Terms'],
+      memberSection: ['Time By Discpline', 'Stats', 'History', 'Top Tags'],
       history: [],
       top: [],
       scale: {all: []},

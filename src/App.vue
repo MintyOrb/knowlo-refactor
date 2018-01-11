@@ -18,7 +18,7 @@
             <!-- member icon here? -->
             <router-link :to="'/m/'+member.uid">{{member.first}}</router-link>
           </li>
-          <!-- <li><a data-activates="query-slide" class="termQuery-collapse show-on-large "><i class="material-icons">menu</i></a></li> -->
+          <!-- <li><a data-activates="query-slide" class="tagQuery-collapse show-on-large "><i class="material-icons">menu</i></a></li> -->
         </ul>
       </div>
     </nav>
@@ -41,7 +41,7 @@
 
   <!-- main view -->
   <transition name="fade" mode="out-in" appear>
-    <router-view :term-query="termQuery" :member="member" style="padding-top:90px" />
+    <router-view :tag-query="tagQuery" :member="member" style="padding-top:90px" />
   </transition>
 
   <footer class="page-footer blue">
@@ -93,7 +93,7 @@ var uiConfig = {
     firebase.auth.GithubAuthProvider.PROVIDER_ID,
     firebase.auth.EmailAuthProvider.PROVIDER_ID
   ],
-  tosUrl: 'knowlo.io/#/legal',   // Terms of service url.
+  tosUrl: 'knowlo.io/#/legal',   // Tags of service url.
   signInFlow: 'popup'
 }
 
@@ -110,12 +110,12 @@ export default {
       member: {
         uid: null
       }, // id and info for member if logged in, uid null if not
-      termQuery: [] // array of term objects to be queried
+      tagQuery: [] // array of tag objects to be queried
     }
   },
   methods: {
     close () {
-      $('.termQuery-collapse').sideNav('hide')
+      $('.tagQuery-collapse').sideNav('hide')
     },
     loginModal () {
       $('#login-modal').modal('open')
@@ -123,7 +123,7 @@ export default {
     touchMember () {
       // ensure member is in DB (add if first time signing in)
       this.$http.post('/api/member', {
-        term: this.term,
+        tag: this.tag,
         translation: this.translation
       }).then(response => {
         if (!response.body) {
@@ -135,7 +135,7 @@ export default {
     }
   },
   mounted () {
-    // needed to recover from occasional mystery DOM exception on resource/term suggestion change
+    // needed to recover from occasional mystery DOM exception on resource/tag suggestion change
     // Vue.config.errorHandler =  (err) => { //TODO figure out what is causing this...vueisotope?
     //   Materialize.toast('whoops...hit a snag. Reload the page if things seem off...',3000)
     //   console.log(err)
@@ -143,9 +143,9 @@ export default {
     //   //   this.$router.go(this.$route)
     //   // }, 2000)
     // };
-    // get term query
-    if (Cookies.get('termQuery')) {
-      this.termQuery = Cookies.getJSON('termQuery')
+    // get tag query
+    if (Cookies.get('tagQuery')) {
+      this.tagQuery = Cookies.getJSON('tagQuery')
     }
 
     // TODO: use this...

@@ -5,8 +5,8 @@ f<template>
 		<label :for="inputId" >{{holderText}}</label>
 		<ul id="ac" class="dropdown-content" style="position:absolute" :class="{ hide: hidden, 'searchDrop': $route.name=='explore' }">
 			<li v-for="suggestion in suggestions" @click.stop.prevent='pick(suggestion)'>
-				<img v-if="suggestion.term.iconURL" :src="suggestion.term.iconURL" class="left">
-				<span><i v-if="suggestion.new" class='material-icons  left'>add</i>{{suggestion.translation.name}}<span v-if="$route.name !='addTerm' && suggestion.new" @click="addWithDetail = true"><i class='material-icons right addDetail'>playlist_add</i></span></span>
+				<img v-if="suggestion.tag.iconURL" :src="suggestion.tag.iconURL" class="left">
+				<span><i v-if="suggestion.new" class='material-icons  left'>add</i>{{suggestion.translation.name}}<span v-if="$route.name !='addTag' && suggestion.new" @click="addWithDetail = true"><i class='material-icons right addDetail'>playlist_add</i></span></span>
 			</li>
 		</ul>
 	</div>
@@ -26,7 +26,7 @@ export default {
       suggestions: [],
       input: '',
       hidden: false,
-      term: {
+      tag: {
         url: '',
         english: ''
       },
@@ -41,10 +41,10 @@ export default {
     pick (item) {
       this.input = ''
       this.suggestions = []
-      if (item.translation.name.indexOf('Create new term:') > -1) { // if term needs to be created
-        this.term.english = this.translation.name = item.translation.name.substr(17).trim()
+      if (item.translation.name.indexOf('Create new tag:') > -1) { // if tag needs to be created
+        this.tag.english = this.translation.name = item.translation.name.substr(17).trim()
         if (this.addWithDetail) {
-          Router.push('/addTerm/' + this.translation.name)
+          Router.push('/addTag/' + this.translation.name)
         } else {
           this.quickAdd()
         }
@@ -54,16 +54,16 @@ export default {
       }
     },
     quickAdd () {
-      this.$http.post('/api/set', {term: this.term, translation: this.translation}).then(response => {
-        if (response.body.term) {
+      this.$http.post('/api/set', {tag: this.tag, translation: this.translation}).then(response => {
+        if (response.body.tag) {
           this.$emit('select', response.body)
           Materialize.toast('"' + response.body.translation.name + '"' + ' created!', 3000)
         } else {
-          Materialize.toast('Something went wrong...term not added.', 4000)
+          Materialize.toast('Something went wrong...tag not added.', 4000)
         }
       }, response => {
         if (response.status === 401) {
-          Materialize.toast('You must be logged in to add a term!', 4000)
+          Materialize.toast('You must be logged in to add a tag!', 4000)
           $('#login-modal').modal('open')
         } else {
           Materialize.toast('Something went wrong...are you online?', 4000)
@@ -84,7 +84,7 @@ export default {
   mounted () {
     var options = {
       inputId: this.inputId || 'search-input',
-      ajaxUrl: this.ajaxUrl || '/api/term/search/',
+      ajaxUrl: this.ajaxUrl || '/api/tag/search/',
       data: {exclude: this.exclude},
       minLength: 1
     }
@@ -166,9 +166,9 @@ export default {
                 // hide "create new" if a match is found
                 if (Object.values(this.suggestions).findIndex(item => this.input.toLowerCase().trim() === item.translation.name.toLowerCase().trim())) {
                   this.suggestions.push({
-                    term: {},
+                    tag: {},
                     translation: {
-                      name: 'Create new term: ' + this.input
+                      name: 'Create new tag: ' + this.input
                     },
                     new: true
                   })
