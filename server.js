@@ -20,7 +20,6 @@ if (process.env.GRAPHENEDB_URL) {
   });
 }
 
-
 admin.initializeApp({
   credential: admin.credential.cert({
     "project_id": "knowlo-952cc",
@@ -30,10 +29,9 @@ admin.initializeApp({
   databaseURL: "https://knowlo-952cc.firebaseio.com/"
 });
 
-app.use('/api/auth', firebaseMiddleware.auth);
+app.use('/api/auth', firebaseMiddleware.auth)
 app.use(bodyParser.json())
-// app.use(express.static(__dirname)) // if local?
-// app.use(serveStatic(__dirname + "/dist")); // if heroku?
+app.use(serveStatic(__dirname + "/dist"))
 
 require('./initDB')(app, db);
 require('./CRUD/tags')(app, db);

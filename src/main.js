@@ -5,11 +5,10 @@ import App from './App'
 import router from './router'
 import 'materialize-css'
 import VueResource from 'vue-resource'
-import 'flickity'
 
 Vue.use(VueResource)
 
-Vue.config.productionTip = false
+Vue.config.productionTip = true
 
 /* eslint-disable no-new */
 new Vue({

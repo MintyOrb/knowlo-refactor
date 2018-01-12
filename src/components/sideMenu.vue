@@ -20,7 +20,7 @@
 	</ul>
 </template>
 <script>
-import firebase from 'firebaseui'
+import firebase from 'firebase'
 import $ from 'jquery'
 export default {
   name: 'sidemenu',

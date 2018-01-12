@@ -8,7 +8,7 @@
   				add resource
   		  </router-link> -->
 
-  <ul data-collapsible="accordion">
+  <ul class='exploreBins' data-collapsible="accordion">
 
     <li data-pane="search" id='search'>
       <div class="collapsible-header searchHead">
@@ -151,7 +151,7 @@
         </span>
       </div>
       <div class="collapsible-body" style="border-bottom:none;">
-        <br/>ad
+        <br/>
         <div class="right quantity">
           <div>Showing {{resources.length}} of {{resourcesRelated}}</div>
           <div v-if='member.uid'><span v-if="showViewed">Including</span><span v-else>Excluding</span> {{resourcesViewed}} viewed</div>
@@ -227,7 +227,6 @@
 import $ from 'jquery'
 import Cookies from 'js-cookie'
 import Materialize from 'materialize-css'
-import Router from 'vue-router'
 import tag from '@/components/tag'
 import resource from '@/components/resource'
 import search from '@/components/search'
@@ -279,7 +278,7 @@ export default {
     },
     random () {
       this.$http.get('/api/resource/random').then(response => {
-        Router.push({
+        this.$router.push({
           name: 'resource',
           params: {
             uid: response.body.uid
@@ -546,7 +545,6 @@ export default {
       })
     },
     fetchResources (infinite) {
-      console.log('in fetch r')
       if (!this.loadingResources && !(infinite && this.resources.length === 0)) { // don't fetch if initial resrouces hadn't had time to load to avoid ending up with top resources twice
         this.loadingResources = true
         this.endOfResources = false
@@ -580,7 +578,6 @@ export default {
               descending: this.descending
             }
           }).then(response => {
-            console.log(response)
             if (response.body.length === 0) {
               this.endOfResources = true
             } else if (infinite) {
@@ -590,11 +587,10 @@ export default {
             }
             this.loadingResources = false
           }, failed => {
-            console.log(failed)
             Materialize.toast('Something went wrong...')
             this.loadingResources = false
           })
-        } else { // general query if not logged in
+        } else { // general query if not logged inconsole.log('getting general')
           this.$http.get('/api/resource', {
             params: {
               languageCode: 'en',

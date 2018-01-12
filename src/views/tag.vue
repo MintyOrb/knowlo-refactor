@@ -20,15 +20,15 @@
   </div>
   <!-- flick navigation for isotope containers -->
   <div class="tagMeta">
-    <div class="metaNav">
+    <flickity class="metaNav">
       <div v-for="step in tagSection" class="navItems">
         <p>
           {{step}}
         </p>
       </div>
-    </div>
+    </flickity>
     <!-- isotope contianers -->
-    <div class="tagSections">
+    <flickity class="tagSections" :options="flickBody">
 
       <div class="stepContainer">
 
@@ -50,21 +50,20 @@
         <div v-for="def in definitions" :key="def['resource']['uid']">
           <resource :re="def" :display="'list'">
           </resource>
-
         </div>
 
       </div>
 
       <div class="stepContainer">
         <isotope ref='syno' :list="synonyms" :options='{}'>
-          <tag v-for="tag in synonyms" :key="tag.setID" :tag="tag" :display="tagDisplay" v-on:include="addToQuery(tag)" v-on:exclude="removeSynonym(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
+          <tag v-for="tag in synonyms" :key="tag.tag.uid" :tag="tag" :display="tagDisplay" v-on:include="addToQuery(tag)" v-on:exclude="removeSynonym(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
           </tag>
         </isotope>
         <search :exclude="$route.params.uid" input-id="syn" v-on:select="addSynonym"></search>
       </div>
       <div class="stepContainer">
         <isotope ref='withn' :list="within" :options='{}'>
-          <tag :tag="tag" v-for="tag in within" :key="tag.translation.name" :display="tagDisplay" v-on:include="addToQuery(tag)" v-on:exclude="removeWithin(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
+          <tag :tag="tag" v-for="tag in within" :key="tag.tag.uid" :display="tagDisplay" v-on:include="addToQuery(tag)" v-on:exclude="removeWithin(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
           </tag>
           <!-- v-on:exclude="removeSynonym(tag.tag.uid)" -->
         </isotope>
@@ -72,7 +71,7 @@
       </div>
       <div class="stepContainer">
         <isotope ref='contains' :list="contains" :options='{}'>
-          <tag :tag="tag" v-for="tag in contains" :display="tagDisplay" :key="tag.setID" v-on:include="addToQuery(tag)" v-on:exclude="removeContains(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
+          <tag :tag="tag" v-for="tag in contains" :display="tagDisplay" :key="tag.tag.uid" v-on:include="addToQuery(tag)" v-on:exclude="removeContains(tag.tag.uid)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
           </tag>
           <!-- v-on:exclude="removeSynonym(tag.tag.uid)" -->
         </isotope>
@@ -80,11 +79,11 @@
       </div>
       <div class="stepContainer">
         <isotope ref='trans' :list="translations" :options='{}'>
-          <tag :tag="tag" v-for="tag in translations" :key="tag.setID" :display="tagDisplay" v-on:include="addToQuery(tag)" v-on:exclude="addToQuery(tag)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
+          <tag :tag="tag" v-for="tag in translations" :key="tag.tag.uid" :display="tagDisplay" v-on:include="addToQuery(tag)" v-on:exclude="addToQuery(tag)" v-on:focus="addToQuery(tag)" v-on:pin="addToQuery(tag)" hide="remove">
           </tag>
         </isotope>
       </div>
-    </div>
+    </flickity>
   </div>
 </div>
 </template>
@@ -92,10 +91,17 @@
 <script>
 import $ from 'jquery'
 import Materialize from 'materialize-css'
-import Router from 'vue-router'
+import isotope from 'vueisotope'
+import addResource from '@/components/addResource'
+import search from '@/components/search'
+import resource from '@/components/resource'
+import tag from '@/components/tag'
+import Flickity from 'vue-flickity'
+
 export default {
-  name: 'tag',
+  name: 'tagv',
   props: ['tagQuery', 'member'],
+  components: { isotope, addResource, search, tag, resource, Flickity },
   data: function () {
     return {
       tag: {
@@ -118,12 +124,26 @@ export default {
       within: [],
       contains: [],
       icons: [],
+      flickNav: {
+        pageDots: false,
+        prevNextButtons: false,
+        accessibility: false,
+        asNavFor: 'tagSections'
+      },
+      flickBody: {
+        wrapAround: true,
+        pageDots: false,
+        prevNextButtons: true,
+        accessibility: false, // to prevent jumping when focused
+        dragThreshold: 20 // play around with this more?
+      },
       tagSection: ['Icon', 'Definition', 'Synonyms', 'Within', 'Contains', 'Translations'] // stats? vote? member's relation? definition?
     }
   },
   methods: {
-    init: function () {
-      this.$http.get('/set/' + this.$route.params.uid, {
+    init () {
+      console.log('in init')
+      this.$http.get('/api/set/' + this.$route.params.uid, {
         params: {
           languageCode: 'en'
         }
@@ -132,8 +152,7 @@ export default {
           response.body.tag.name = response.body.translation.name
           response.body.tag.status = {}
           this.tag = response.body
-          // this.$route.params.name
-          this.tag.setID = this.$route.params.uid
+          this.tag.setID = response.body.tag.uid
           this.fetchSynonyms()
           this.fetchWithin()
           this.fetchContains()
@@ -167,12 +186,8 @@ export default {
             $('body').css('overflow', 'hidden')
           },
           complete: () => {
-            if ($('.metaNav').flickity()) {
-              $('.metaNav').flickity('destroy')
-              $('.tagSections').flickity('destroy')
-            }
             $('body').css('overflow', 'auto')
-            Router.push('/')
+            this.$router.push('/')
           }
         }).modal('open')
       })
@@ -184,7 +199,7 @@ export default {
       if (top.resource.mThumb !== this.tag.tag.iconURL && top.globalVote.quality !== null) {
         // triggering new top icon from the front end is probably stupid.
         this.tag.tag.iconURL = top.resource.mThumb
-        this.$http.put('/api/set/' + this.tag.setID + '/' + top.resource.uid + '/newTopIcon').then(response => {
+        this.$http.put('/api/auth/set/' + this.tag.setID + '/' + top.resource.uid + '/newTopIcon').then(response => {
           Materialize.toast('New top icon!', 4000)
         }, response => {
           Materialize.toast('Something went wrong...are you online?', 4000)
@@ -200,7 +215,7 @@ export default {
     },
     fetchMeta: function (type) {
       if (this.member.uid !== null) {
-        this.$http.get('/api/set/' + this.$route.params.uid + '/meta/', {
+        this.$http.get('/api/auth/set/' + this.$route.params.uid + '/meta/', {
           params: {
             languageCode: 'en',
             type: type
@@ -215,7 +230,7 @@ export default {
           Materialize.toast('Something went wrong...are you online?', 4000)
         })
       } else {
-        this.$http.get('/set/' + this.$route.params.uid + '/meta/', {
+        this.$http.get('/api/set/' + this.$route.params.uid + '/meta/', {
           params: {
             languageCode: 'en',
             type: type
@@ -232,7 +247,7 @@ export default {
       }
     },
     fetchTranslations: function () {
-      this.$http.get('/set/' + this.$route.params.uid + '/translation/', {
+      this.$http.get('/api/set/' + this.$route.params.uid + '/translation/', {
         params: {
           languageCode: 'en'
         }
@@ -248,7 +263,7 @@ export default {
       })
     },
     fetchSynonyms: function () {
-      this.$http.get('/set/' + this.$route.params.uid + '/synonym/', {
+      this.$http.get('/api/set/' + this.$route.params.uid + '/synonym/', {
         params: {
           languageCode: 'en'
         }
@@ -256,7 +271,7 @@ export default {
         if (response.body.length > 0) {
           this.synonyms = response.body
         } else {
-          Materialize.toast('Synonyms not found.', 4000)
+          // Materialize.toast('Synonyms not found.', 4000)
           this.synonyms = []
         }
       }, response => {
@@ -264,7 +279,7 @@ export default {
       })
     },
     addSynonym: function (synonym) { // TODO: this merges sets...need a separate method for adding tag to set
-      this.$http.put('/api/set/' + this.tag.setID + '/synonym/' + synonym.setID).then(response => {
+      this.$http.put('/api/auth/set/' + this.tag.setID + '/synonym/' + synonym.setID).then(response => {
         if (response.body) {
           Materialize.toast('Added!', 4000)
           this.synonyms.push(synonym)
@@ -276,7 +291,7 @@ export default {
       })
     },
     removeSynonym: function (synUID) {
-      this.$http.delete('/api/set/' + this.tag.setID + '/synonym/' + synUID).then(response => {
+      this.$http.delete('/api/auth/set/' + this.tag.setID + '/synonym/' + synUID).then(response => {
         if (response.body) {
           Materialize.toast('Removed!', 4000)
           this.synonyms.splice(this.synonyms.findIndex((tag) => tag.tag.uid === synUID), 1)
@@ -288,7 +303,7 @@ export default {
       })
     },
     fetchWithin: function () {
-      this.$http.get('/set/' + this.tag.setID + '/within/', {
+      this.$http.get('/api/set/' + this.tag.setID + '/within/', {
         params: {
           languageCode: 'en'
         }
@@ -303,7 +318,7 @@ export default {
       })
     },
     addWithin: function (within) {
-      this.$http.put('/api/set/' + this.tag.setID + '/within/' + within.tag.uid).then(response => {
+      this.$http.put('/api/auth/set/' + this.tag.setID + '/within/' + within.tag.uid).then(response => {
         if (response.body) {
           Materialize.toast('Added!', 4000)
           this.within.push(within)
@@ -315,7 +330,7 @@ export default {
       })
     },
     removeWithin: function (uid) {
-      this.$http.delete('/api/set/' + this.tag.setID + '/within/' + uid).then(response => {
+      this.$http.delete('/api/auth/set/' + this.tag.setID + '/within/' + uid).then(response => {
         if (response.body) {
           Materialize.toast('Removed!', 4000)
           this.within.splice(this.within.findIndex((tag) => tag.tag.uid === uid), 1)
@@ -327,7 +342,7 @@ export default {
       })
     },
     fetchContains: function () {
-      this.$http.get('/set/' + this.tag.setID + '/contains/', {
+      this.$http.get('/api/set/' + this.tag.setID + '/contains/', {
         params: {
           languageCode: 'en'
         }
@@ -335,7 +350,7 @@ export default {
         if (response.body.length > 0) {
           this.contains = response.body
         } else {
-          Materialize.toast('Contains no tags.', 4000)
+          // Materialize.toast('Contains no tags.', 4000)
           this.contains = []
         }
       }, response => {
@@ -343,7 +358,7 @@ export default {
       })
     },
     addContains: function (contains) {
-      this.$http.put('/api/set/' + this.tag.setID + '/contains/' + contains.tag.uid).then(response => {
+      this.$http.put('/api/auth/set/' + this.tag.setID + '/contains/' + contains.tag.uid).then(response => {
         if (response.body) {
           Materialize.toast('Added!', 4000)
           this.contains.push(contains)
@@ -355,7 +370,7 @@ export default {
       })
     },
     removeContains: function (uid) {
-      this.$http.delete('/api/set/' + this.tag.setID + '/contains/' + uid).then(response => {
+      this.$http.delete('/api/auth/set/' + this.tag.setID + '/contains/' + uid).then(response => {
         if (response.body) {
           Materialize.toast('Removed!', 4000)
           this.contains.splice(this.contains.findIndex((tag) => tag.tag.uid === uid), 1)
@@ -367,7 +382,7 @@ export default {
       })
     },
     deleteSet (uid) {
-      this.$http.delete('/api/set/' + uid).then(response => {
+      this.$http.delete('/api/api/set/' + uid).then(response => {
         if (response.body) {
           Materialize.toast('Set deleted.', 4000)
         } else {
@@ -382,27 +397,12 @@ export default {
       $('#tagModal').modal('close')
     }
   },
-  mounted: function () {
+  mounted () {
     this.init()
-    $('.metaNav').flickity({
-      asNavFor: '.tagSections',
-      pageDots: false,
-      prevNextButtons: false,
-      accessibility: false // to prevent jumping when focused
-    })
-
-    $('.tagSections').flickity({
-      wrapAround: true,
-      pageDots: false,
-      prevNextButtons: true,
-      accessibility: false, // to prevent jumping when focused
-      dragThreshold: 20 // play around with this more?
-    })
-
     // TODO: set flickity tab in URL
     $('.tagSections').flickity('selectCell', 1, true, true) //  value, isWrapped, isInstant
   },
-  beforeRouteLeave: function (to, from, next) {
+  beforeRouteLeave (to, from, next) {
     $('body').css('overflow', 'auto')
     if ($('.modal-overlay')) {
       $('.modal-overlay').remove()

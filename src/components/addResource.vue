@@ -1,17 +1,17 @@
 <template :tag-query='tagQuery' :member='member'>
   <div id='addResourceModal' class='modal modal-fixed-footer'>
   <div class="addMeta modal-content">
-  <div class="addNav">
+  <flickity :options='flickNav' class="addNav">
   <div>
   <span>{{type}}</span>
   </div>
   <div v-if="type==='discussion' || type==='resource' " class="navItems">
   <span>Tag</span>
   </div>
-  </div>
+</flickity>
 
   <!-- isotope contianers -->
-  <div class="addSections">
+  <flickity :options='flickBody' class="addSections">
   <div class="addContainer">
   <form :class="{bigtop:type==='resource'}">
 
@@ -117,7 +117,7 @@
   </div>
   <!--  here the user provides the url of the resource , or, eventually the file to be uploaded or the text -->
 
-  </div>
+  </flickity>
   </div>
   <div class="modal-footer">
   <a @click="closeModal" class="waves-effect waves-blue btn-flat ">close</a>
@@ -128,8 +128,11 @@
 <script>
 import $ from 'jquery'
 import Materialize from 'materialize-css'
+import Flickity from 'vue-flickity'
+
 export default {
   name: 'addResource',
+  components: { Flickity },
   props: {
     member: Object,
     type: {
@@ -142,6 +145,19 @@ export default {
       synSetMeta: false,  // tag resource to set
       resouceMeta: false, // tag resource to resource
       flickRegistry: [],
+      flickNav: {
+        asNavFor: '.addSections',
+        pageDots: true,
+        prevNextButtons: true,
+        accessibility: false // to prevent jumping when focused
+      },
+      flickBody: {
+        wrapAround: true,
+        pageDots: false,
+        prevNextButtons: true,
+        accessibility: false, // to prevent jumping when focused
+        dragThreshold: 20 // play around with this more?
+      },
       discussionFilter: [],
       dIDs: { // setIDS for adding by switch
         'insight': 'rJxPWooTO-',
@@ -182,31 +198,11 @@ export default {
           $('.fullPage').css('overflow', 'hidden')
         },
         complete: () => {
-          if ($('.addNav').flickity() && $('.addSections').flickity()) {
-            $('.addNav').flickity('destroy')
-            $('.addSections').flickity('destroy')
-          }
-
           $('.fullPage').css('overflow', 'auto')
 
           this.$emit('close')
         }
       }).modal('open')
-
-      $('.addNav').flickity({
-        asNavFor: '.addSections',
-        pageDots: true,
-        prevNextButtons: true,
-        accessibility: false // to prevent jumping when focused
-      })
-
-      $('.addSections').flickity({
-        wrapAround: true,
-        pageDots: false,
-        prevNextButtons: true,
-        accessibility: false, // to prevent jumping when focused
-        dragThreshold: 20 // play around with this more?
-      })
     },
     closeModal () {
       $('#addResourceModal').modal('close')
@@ -327,7 +323,7 @@ export default {
           this.$emit('added', holder)
           if (!this.synSetMeta) {
             this.getSuggestedTags()
-            $('.addSections').flickity('selectCell', 1, true, false) //  value, isWrapped, isInstant
+            // $('.addSections').flickity('selectCell', 1, true, false) //  value, isWrapped, isInstant
           }
         } else {
           Materialize.toast('Something went wrong...', 4000)

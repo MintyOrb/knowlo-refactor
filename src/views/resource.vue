@@ -52,16 +52,17 @@
   </div>
 
   <div class="resourceMeta">
-    <div class="metaNav">
+    <!-- <div class="metaNav"> -->
       <!-- flick navigation for isotope containers -->
+      <flickity class="metaNav" :options="flickNav">
       <div v-for="step in resourceSection">
         <p>
           {{step}}
         </p>
       </div>
-    </div>
-    <!-- isotope contianers -->
-    <div class="resourceSections">
+      </flickity>
+    <!-- </div> -->
+    <flickity :options="flickBody" class="resourceSections">
       <!-- discussion -->
       <div class="resourceStep discussion">
         <div class="center margin20">
@@ -138,7 +139,14 @@
       <!-- tags -->
       <div class="resourceStep">
         <isotope ref='rTagBin' :list="tags" :options='{}'>
-          <tag v-for="tag in tags" :tag="tag" :key="tag.setID" display="list" v-on:include="addToQuery(tag); close();" v-on:remove="removeTag(tag.setID)" v-on:focus="addToQuery(tag); close();" v-on:pin="addToQuery(tag); close();">
+          <tag v-for="tag in tags"
+          :key="tag.setID"
+          :tag="tag"
+          display="list"
+          v-on:include="addToQuery(tag); close();"
+          v-on:remove="removeTag(tag.setID)"
+          v-on:focus="addToQuery(tag); close();"
+          v-on:pin="addToQuery(tag); close();">
           </tag>
         </isotope>
         <search exclude="" input-id="resourceTest" v-on:select="addTag"></search>
@@ -149,7 +157,7 @@
           <resource v-for="re in related" :re="re" :key="re.resource.uid" :display="'card'" :voting='false'></resource>
         </isotope>
       </div>
-    </div>
+    </flickity :options="flickBody">
     <div class="addBtn">
       <a @click="addResourceType='discussion'; addResource = true;" class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
     </div>
@@ -160,25 +168,47 @@
 <script>
 import Materialize from 'materialize-css'
 import $ from 'jquery'
-import Router from 'vue-router'
 import tag from '@/components/tag'
 import resource from '@/components/resource'
 import search from '@/components/search'
 import isotope from 'vueisotope'
+import Flickity from 'vue-flickity'
+import 'flickity-as-nav-for'
+import L from 'leaflet'
 
 export default {
   props: ['member'],
-  components: { isotope, search, tag, resource },
+  components: { isotope, search, tag, resource, Flickity },
   data: function () {
     return {
       resource: {
         uid: undefined
       },
+      flickNav: {
+        asNavFor: document.querySelector('.resourceSections'),
+        selectedAttraction: 0.2,
+        friction: 0.8,
+        // wrapAround: true,
+        // pageDots: false,
+        prevNextButtons: false,
+        contain: true,
+        // freeScroll: true,
+        accessibility: false
+      },
+      flickBody: {
+        wrapAround: true,
+        pageDots: false,
+        prevNextButtons: true,
+        selectedAttraction: 0.2,
+        friction: 0.8,
+        accessibility: false, // to prevent jumping when focused
+        dragThreshold: 20 // play around with this more?
+      },
       tags: [], // current resources tags
       discussion: [], // resources within discussion
       related: [], // resources related to current resource
       discussionDisplay: 'card', // default display for discussion
-      resourceSection: ['Discussion', 'Detail', 'tags', 'Related'],
+      resourceSection: ['Discussion', 'Detail', 'Tags', 'Related'],
       addResource: false,
       addResourceType: '',
       modalOpen: false,
@@ -247,27 +277,27 @@ export default {
       this.$nextTick(function () {
         if (!this.modalOpen) {
           this.modalOpen = true
-          $('.metaNav').flickity({
-            asNavFor: '.resourceSections',
-            selectedAttraction: 0.2,
-            friction: 0.8,
-            // wrapAround: true,
-            // pageDots: false,
-            prevNextButtons: false,
-            contain: true,
-            // freeScroll: true,
-            accessibility: false // to prevent jumping when focused
-          })
+          // $('.metaNav').flickity({
+          //   asNavFor: '.resourceSections',
+          //   selectedAttraction: 0.2,
+          //   friction: 0.8,
+          //   // wrapAround: true,
+          //   // pageDots: false,
+          //   prevNextButtons: false,
+          //   contain: true,
+          //   // freeScroll: true,
+          //   accessibility: false // to prevent jumping when focused
+          // })
 
-          $('.resourceSections').flickity({
-            wrapAround: true,
-            pageDots: false,
-            prevNextButtons: true,
-            selectedAttraction: 0.2,
-            friction: 0.8,
-            accessibility: false, // to prevent jumping when focused
-            dragThreshold: 20 // play around with this more?
-          })
+          // $('.resourceSections').flickity({
+          //   wrapAround: true,
+          //   pageDots: false,
+          //   prevNextButtons: true,
+          //   selectedAttraction: 0.2,
+          //   friction: 0.8,
+          //   accessibility: false, // to prevent jumping when focused
+          //   dragThreshold: 20 // play around with this more?
+          // })
           $('#resourceModal' + this.resource.uid).modal({
             opacity: 0.5, // Opacity of modal background
             inDuration: 300, // Transition in duration
@@ -278,7 +308,7 @@ export default {
               $('body').css('overflow', 'hidden')
             },
             complete: () => {
-              Router.push('/')
+              this.$router.push('/')
             }
           }).modal('open')
         }
@@ -369,10 +399,9 @@ export default {
       }
     },
     initImage: function () {
-      var map
-      var L
+      var map = window.map
       // from http://kempe.net/blog/2014/06/14/leaflet-pan-zoom-image.html
-      if (window.map) { // remove previous map, if any (necessary for transistion from one image resource to another)
+      if (map) { // remove previous map, if any (necessary for transistion from one image resource to another)
         map.remove()
       }
       window.map = L.map('image-map', {
@@ -382,6 +411,7 @@ export default {
         zoom: 2,
         crs: L.CRS.Simple
       })
+      map = window.map
 
       // dimensions of the image
       var w = 2000
@@ -389,22 +419,22 @@ export default {
       var url = this.resource.url
       var img = new Image()
       img.onload = function () {
-        map.removeLayer(preLoad)
-        var southWest = map.unproject([0, this.height], map.getMaxZoom() - 1)
-        var northEast = map.unproject([this.width, 0], map.getMaxZoom() - 1)
-        var bounds = new L.LatLngBounds(southWest, northEast)
-
-        // add the image overlay,
-        // so that it covers the entire map
-        L.imageOverlay(url, bounds).addTo(map)
-        map.setMaxBounds(bounds)
+        if (typeof map !== 'undefined') {
+          map.removeLayer(preLoad)
+          var southWest = map.unproject([0, this.height], map.getMaxZoom() - 1)
+          var northEast = map.unproject([this.width, 0], map.getMaxZoom() - 1)
+          var bounds = new L.LatLngBounds(southWest, northEast)
+          // add the image overlay,
+          // so that it covers the entire map
+          L.imageOverlay(url, bounds).addTo(map)
+          map.setMaxBounds(bounds)
+        }
       }
       img.src = url
       // calculate the edges of the image, in coordinate space
       var southWest = map.unproject([0, h], map.getMaxZoom() - 1)
       var northEast = map.unproject([w, 0], map.getMaxZoom() - 1)
       var bounds = new L.LatLngBounds(southWest, northEast)
-
       // add the image overlay,
       // so that it covers the entire map
       var preLoad = L.imageOverlay(url, bounds).addTo(map)
@@ -578,5 +608,12 @@ and (max-device-width : 480px) { /* portrait tablets, portrait iPad, landscape e
 }
 iframe{
   border-width: 0;
+}
+.metaNav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: white;
+  box-shadow: 0 5px 5px 0 rgba(0,0,0,0.2), 0 7px 11px 0 rgba(0,0,0,0.19);
 }
 </style>

@@ -239,13 +239,6 @@ export default {
   font-size: 30px;
   padding-top:20px;
 }
-.metaNav {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background-color: white;
-  box-shadow: 0 5px 5px 0 rgba(0,0,0,0.2), 0 7px 11px 0 rgba(0,0,0,0.19);
-}
 .message {
   font-size: 30px;
   font-weight: 300;

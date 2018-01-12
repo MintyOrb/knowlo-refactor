@@ -1,7 +1,7 @@
 f<template>
   <div class="input-field ">
 		<i class="material-icons prefix">search</i>
-		<input type="text" v-on:click.stop.prevent="" :id="inputId" class="search" v-model="input" @blur="hide" @focus="hidden=false">
+		<input type="text" v-on:click.stop.prevent="" :id="inputId" class="search" v-model="input"  @focus="hidden=false">
 		<label :for="inputId" >{{holderText}}</label>
 		<ul id="ac" class="dropdown-content" style="position:absolute" :class="{ hide: hidden, 'searchDrop': $route.name=='explore' }">
 			<li v-for="suggestion in suggestions" @click.stop.prevent='pick(suggestion)'>
@@ -14,7 +14,6 @@ f<template>
 <script>
 import $ from 'jquery'
 import Materialize from 'materialize-css'
-import Router from 'vue-router'
 // adapted from  http://stackoverflow.com/a/42757285/2061741
 // TODO: there is a LOT of direct DOM manipulation here that probably ought to be cleaned up.
 export default {
@@ -44,7 +43,7 @@ export default {
       if (item.translation.name.indexOf('Create new tag:') > -1) { // if tag needs to be created
         this.tag.english = this.translation.name = item.translation.name.substr(17).trim()
         if (this.addWithDetail) {
-          Router.push('/addTag/' + this.translation.name)
+          this.$router.push('/addTag/' + this.translation.name)
         } else {
           this.quickAdd()
         }
@@ -158,25 +157,22 @@ export default {
         if (val.length > options.minLength) {
           timeout = setTimeout(() => { // comment this line to remove timeout
             runningRequest = true
-            request = $.ajax({
-              type: 'GET',
-              url: options.ajaxUrl + val + '/' + this.exclude,
-              success: (data) => {
-                this.suggestions = data
-                // hide "create new" if a match is found
-                if (Object.values(this.suggestions).findIndex(item => this.input.toLowerCase().trim() === item.translation.name.toLowerCase().trim())) {
-                  this.suggestions.push({
-                    tag: {},
-                    translation: {
-                      name: 'Create new tag: ' + this.input
-                    },
-                    new: true
-                  })
-                }
-              },
-              complete () {
-                runningRequest = false
+            this.$http.get(options.ajaxUrl + val + '/' + this.exclude).then(data => {
+              this.suggestions = data.body
+              runningRequest = false
+              // hide "create new" if a match is found
+              if (Object.values(this.suggestions).findIndex(item => this.input.toLowerCase().trim() === item.translation.name.toLowerCase().trim())) {
+                this.suggestions.push({
+                  tag: {},
+                  translation: {
+                    name: 'Create new tag: ' + this.input
+                  },
+                  new: true
+                })
               }
+            },
+            fail => {
+              console.log(fail)
             })
           }, 250) // comment this line to remove timeout
         }
@@ -211,5 +207,13 @@ export default {
 }
 .addDetail:hover{
   background-color:rgb(210, 210, 210);
+}
+#ac {
+  display: inline;
+  opacity: 1;
+}
+#ac img {
+  height: 50px;
+  width: 50px;
 }
 </style>

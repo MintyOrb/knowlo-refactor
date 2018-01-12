@@ -10,6 +10,8 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
+
+    // in dev, send db requests to server, let vue handle static assets
     proxyTable: {
       '/api': {
         target: 'http://localhost:8000',

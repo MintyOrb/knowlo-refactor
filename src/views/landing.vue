@@ -70,12 +70,11 @@
 </template>
 
 <script>
-import Router from 'vue-router'
 export default {
   methods: {
     random () {
-      this.$http.get('/resource/random').then(response => {
-        Router.push({
+      this.$http.get('/api/resource/random').then(response => {
+        this.$router.push({
           name: 'resource',
           params: {
             uid: response.body.uid
